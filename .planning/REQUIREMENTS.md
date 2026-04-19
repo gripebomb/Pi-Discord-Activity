@@ -57,33 +57,33 @@
 
 | Requirement | Phase | Status |
 | ----------- | ----- | ------ |
-| PIEXT-01 | - | Pending |
-| PIEXT-02 | - | Pending |
-| PIEXT-03 | - | Pending |
-| PIEXT-04 | - | Pending |
-| PRES-01 | - | Pending |
-| PRES-02 | - | Pending |
-| PRES-03 | - | Pending |
-| PRES-04 | - | Pending |
-| PRES-05 | - | Pending |
-| RUNT-01 | - | Pending |
-| RUNT-02 | - | Pending |
-| RUNT-03 | - | Pending |
-| RUNT-04 | - | Pending |
-| RUNT-05 | - | Pending |
-| INST-01 | - | Pending |
-| INST-02 | - | Pending |
-| INST-03 | - | Pending |
-| INST-04 | - | Pending |
-| INST-05 | - | Pending |
-| INST-06 | - | Pending |
-| INST-07 | - | Pending |
+| PIEXT-01 | Phase 1 | Pending |
+| PIEXT-02 | Phase 1 | Pending |
+| PIEXT-03 | Phase 1 | Pending |
+| PIEXT-04 | Phase 1 | Pending |
+| RUNT-01 | Phase 1 | Pending |
+| PRES-01 | Phase 2 | Pending |
+| PRES-02 | Phase 2 | Pending |
+| PRES-03 | Phase 2 | Pending |
+| PRES-04 | Phase 2 | Pending |
+| PRES-05 | Phase 2 | Pending |
+| RUNT-02 | Phase 2 | Pending |
+| RUNT-03 | Phase 2 | Pending |
+| RUNT-04 | Phase 2 | Pending |
+| RUNT-05 | Phase 2 | Pending |
+| INST-01 | Phase 3 | Pending |
+| INST-02 | Phase 3 | Pending |
+| INST-03 | Phase 3 | Pending |
+| INST-04 | Phase 3 | Pending |
+| INST-05 | Phase 3 | Pending |
+| INST-06 | Phase 3 | Pending |
+| INST-07 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 21 total
-- Mapped to phases: 0
-- Unmapped: 21 ⚠️
+- Mapped to phases: 21 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 after initial definition*
+*Last updated: 2026-04-19 after roadmap creation*
