@@ -1,0 +1,54 @@
+{
+  "name": "pi-discord-presence",
+  "version": "0.1.0",
+  "description": "Discord Rich Presence extension and helper for the Pi coding agent.",
+  "private": true,
+  "type": "module",
+  "main": "dist/helper/index.js",
+  "bin": {
+    "pi-discord-presence-helper": "dist/cli/run-helper.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "dev:helper": "tsx src/cli/run-helper.ts",
+    "dev:extension": "tsx src/extension/index.ts",
+    "start": "node dist/cli/run-helper.js",
+    "test": "tsx --test tests/**/*.test.ts",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "pi",
+    "pi-package",
+    "discord",
+    "rich-presence",
+    "rpc",
+    "coding-agent"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "discord-rpc": "^4.0.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*"
+  },
+  "peerDependenciesMeta": {
+    "@mariozechner/pi-coding-agent": {
+      "optional": true
+    }
+  },
+  "pi": {
+    "extensions": [
+      "./src/extension/index.ts"
+    ]
+  }
+}

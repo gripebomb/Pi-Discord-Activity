@@ -7,10 +7,10 @@
 
 ### Pi Extension
 
-- [ ] **PIEXT-01**: Pi can load the integration as a real extension entrypoint using Pi’s documented extension API
-- [ ] **PIEXT-02**: User can install or load the extension through Pi’s extension/package system rather than only through placeholder dev hooks
-- [ ] **PIEXT-03**: Extension reacts to real Pi session, model, and work lifecycle events during actual Pi usage
-- [ ] **PIEXT-04**: Extension maps Pi lifecycle events into normalized presence states before publishing updates
+- [x] **PIEXT-01**: Pi can load the integration as a real extension entrypoint using Pi's documented extension API
+- [x] **PIEXT-02**: User can install or load the extension through Pi's extension/package system rather than only through placeholder dev hooks
+- [x] **PIEXT-03**: Extension reacts to real Pi session, model, and work lifecycle events during actual Pi usage
+- [x] **PIEXT-04**: Extension maps Pi lifecycle events into normalized presence states before publishing updates
 
 ### Presence
 
@@ -22,7 +22,7 @@
 
 ### Runtime
 
-- [ ] **RUNT-01**: Extension publishes payloads that the helper accepts and validates successfully
+- [x] **RUNT-01**: Extension publishes payloads that the helper accepts and validates successfully
 - [ ] **RUNT-02**: Helper debounces rapid updates so Discord presence does not thrash during active Pi usage
 - [ ] **RUNT-03**: Helper connects to Discord RPC and updates presence reliably during normal local use
 - [ ] **RUNT-04**: Helper clears Discord presence on shutdown
@@ -57,11 +57,11 @@
 
 | Requirement | Phase | Status |
 | ----------- | ----- | ------ |
-| PIEXT-01 | Phase 1 | Pending |
-| PIEXT-02 | Phase 1 | Pending |
-| PIEXT-03 | Phase 1 | Pending |
-| PIEXT-04 | Phase 1 | Pending |
-| RUNT-01 | Phase 1 | Pending |
+| PIEXT-01 | Phase 1 | ✓ (2026-04-19) |
+| PIEXT-02 | Phase 1 | ✓ (2026-04-19) |
+| PIEXT-03 | Phase 1 | ✓ (2026-04-19) |
+| PIEXT-04 | Phase 1 | ✓ (2026-04-19) |
+| RUNT-01 | Phase 1 | ✓ (2026-04-19) |
 | PRES-01 | Phase 2 | Pending |
 | PRES-02 | Phase 2 | Pending |
 | PRES-03 | Phase 2 | Pending |

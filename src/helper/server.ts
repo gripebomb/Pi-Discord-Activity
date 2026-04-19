@@ -1,0 +1,30 @@
+import http from "node:http";
+import { presencePayloadSchema, type PresencePayload } from "../shared/types.js";
+import { defaultConfig } from "../shared/config.js";
+
+export function createPresenceServer(onPresence: (payload: PresencePayload) => Promise<void>) {
+  return http.createServer((req, res) => {
+    if (req.method !== "POST" || req.url !== "/presence") {
+      res.writeHead(404).end("Not Found");
+      return;
+    }
+
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+
+    req.on("end", async () => {
+      try {
+        const parsed = presencePayloadSchema.parse(JSON.parse(body));
+        await onPresence(parsed);
+        res.writeHead(204).end();
+      } catch (error) {
+        console.error("Failed to process presence update", error);
+        res.writeHead(400).end("Bad Request");
+      }
+    });
+  }).listen(defaultConfig.serverPort, defaultConfig.serverHost, () => {
+    console.log(`Presence server listening at http://${defaultConfig.serverHost}:${defaultConfig.serverPort}`);
+  });
+}

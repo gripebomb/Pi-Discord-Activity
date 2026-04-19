@@ -19,19 +19,21 @@
 
 ### Requirements
 
-- **PIEXT-01**: Pi can load the integration as a real extension entrypoint using Pi's documented extension API
-- **PIEXT-02**: User can install or load the extension through Pi's extension/package system rather than only through placeholder dev hooks
-- **PIEXT-03**: Extension reacts to real Pi session, model, and work lifecycle events during actual Pi usage
-- **PIEXT-04**: Extension maps Pi lifecycle events into normalized presence states before publishing updates
-- **RUNT-01**: Extension publishes payloads that the helper accepts and validates successfully
+- ~~**PIEXT-01**~~: Pi can load the integration as a real extension entrypoint using Pi's documented extension API — ✓ verified live 2026-04-19
+- ~~**PIEXT-02**~~: User can install or load the extension through Pi's extension/package system rather than only through placeholder dev hooks — ✓ verified via `pi install .`
+- ~~**PIEXT-03**~~: Extension reacts to real Pi session, model, and work lifecycle events during actual Pi usage — ✓ verified with live Pi session
+- ~~**PIEXT-04**~~: Extension maps Pi lifecycle events into normalized presence states before publishing updates — ✓ verified (starting/thinking/tooling/editing/idle)
+- ~~**RUNT-01**~~: Extension publishes payloads that the helper accepts and validates successfully — ✓ verified via live helper + Discord RPC
 
 ### Success Criteria
 
-1. Extension exports a valid `default function (pi: ExtensionAPI)` entrypoint that Pi can load
-2. Extension subscribes to real Pi events (session_start, model_select, agent_start, tool_execution_start, tool_execution_end, agent_end, session_shutdown)
-3. Extension state mapper normalizes Pi events into starting/thinking/tooling/editing/idle/error states
-4. Extension publishes valid presence payloads to the local helper over HTTP
-5. Extension loads from a supported Pi extension/package location (not only via placeholder dev bootstrapping)
+1. ~~Extension exports a valid `default function (pi: ExtensionAPI)` entrypoint that Pi can load~~ ✓ verified
+2. ~~Extension subscribes to real Pi events (session_start, model_select, agent_start, tool_execution_start, tool_execution_end, agent_end, session_shutdown)~~ ✓ verified
+3. ~~Extension state mapper normalizes Pi events into starting/thinking/tooling/editing/idle/error states~~ ✓ verified
+4. ~~Extension publishes valid presence payloads to the local helper over HTTP~~ ✓ verified
+5. ~~Extension loads from a supported Pi extension/package location (not only via placeholder dev bootstrapping)~~ ✓ verified via `pi install .`
+
+**Completed:** 2026-04-19 ✓
 
 ### Key Implementation Notes
 
@@ -117,11 +119,11 @@
 
 | Requirement | Phase | Status |
 | ----------- | ----- | ------ |
-| PIEXT-01 | Phase 1 | Pending |
-| PIEXT-02 | Phase 1 | Pending |
-| PIEXT-03 | Phase 1 | Pending |
-| PIEXT-04 | Phase 1 | Pending |
-| RUNT-01 | Phase 1 | Pending |
+| PIEXT-01 | Phase 1 | ✓ (2026-04-19) |
+| PIEXT-02 | Phase 1 | ✓ (2026-04-19) |
+| PIEXT-03 | Phase 1 | ✓ (2026-04-19) |
+| PIEXT-04 | Phase 1 | ✓ (2026-04-19) |
+| RUNT-01 | Phase 1 | ✓ (2026-04-19) |
 | PRES-01 | Phase 2 | Pending |
 | PRES-02 | Phase 2 | Pending |
 | PRES-03 | Phase 2 | Pending |
@@ -146,4 +148,4 @@
 
 ---
 *Roadmap created: 2026-04-19*
-*Last updated: 2026-04-19 after initial roadmap*
+*Last updated: 2026-04-19 after Phase 1 completion*
