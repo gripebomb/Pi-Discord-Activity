@@ -19,6 +19,51 @@ This project is split into two pieces:
 
 ## Quick Start
 
+### Published package install
+
+For most users, the simplest path is to install the published package into Pi and then run the helper.
+
+1. **Install the Pi package**
+
+   ```bash
+   pi install npm:pi-discord-activity
+   ```
+
+2. **Start the helper**
+
+   If the package was installed globally, the helper binary should be available as:
+
+   ```bash
+   pi-discord-activity-helper
+   ```
+
+   If you prefer to run it directly from npm without a global helper install, use:
+
+   ```bash
+   npx pi-discord-activity-helper
+   ```
+
+3. **Verify the integration**
+
+   Follow [docs/verification.md](./docs/verification.md) for the Discord-side checks.
+
+### Direct npm install
+
+If you want the helper available directly from npm on your PATH:
+
+```bash
+npm install -g pi-discord-activity
+pi-discord-activity-helper
+```
+
+This installs the helper binary, but you should still install the Pi package so Pi loads the extension:
+
+```bash
+pi install npm:pi-discord-activity
+```
+
+### Local repo / development install
+
 1. **Configure Discord (optional)**
 
    The package already ships with a working default Discord application ID, so custom setup is optional.
@@ -92,7 +137,29 @@ Typical next steps for a new user:
 
 For the full guided flow, see [INSTALL.md](./INSTALL.md).
 
-Quick install:
+### Install from the published package
+
+Recommended for most users:
+
+```bash
+pi install npm:pi-discord-activity
+pi-discord-activity-helper
+```
+
+Alternative helper startup without a global binary:
+
+```bash
+npx pi-discord-activity-helper
+```
+
+If you want the helper installed globally through npm as well:
+
+```bash
+npm install -g pi-discord-activity
+pi-discord-activity-helper
+```
+
+### Install from the local repo
 
 ```bash
 npm install
