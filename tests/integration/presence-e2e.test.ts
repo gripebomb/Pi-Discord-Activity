@@ -15,6 +15,9 @@ test("extension transport sends payloads that helper server accepts end-to-end",
   try {
     await new Promise((resolve) => setTimeout(resolve, 25));
 
+    const healthResponse = await fetch(`http://${config.serverHost}:${config.serverPort}/health`);
+    assert.equal(healthResponse.status, 204);
+
     await publishPresence({
       app: "pi-coding-agent",
       provider: "anthropic",

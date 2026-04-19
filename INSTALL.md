@@ -2,13 +2,13 @@
 
 This guide walks through installing the Pi extension and the local helper so Discord activity reflects real Pi activity.
 
-If you want the shortest path:
+If you want the shortest local-repo path:
 
 1. `npm install`
 2. `npm run build`
 3. `pi install .`
-4. `npm start`
-5. Open Pi and verify activity in Discord
+4. Open Pi and let the extension auto-start the helper
+5. Verify activity in Discord
 
 For a guided setup that writes `.env`, builds the project, optionally installs the extension, and can create a background service, use:
 
@@ -93,6 +93,7 @@ PI_PRESENCE_PORT=42666
 PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_AUTOSTART_HELPER=true
 PI_PRESENCE_DEBUG=false
 ```
 
@@ -163,16 +164,28 @@ npm pack
 That produces a tarball such as:
 
 ```text
-pi-discord-activity-0.1.0.tgz
+pi-discord-activity-0.1.1.tgz
 ```
 
 The tarball is useful for inspecting the packaged contents or for advanced distribution workflows. For day-to-day local setup, `pi install .` from the repo root is simpler.
 
-## Step 6: Start the helper
+## Step 6: Helper startup mode
 
-### Foreground / terminal session
+### Default: let Pi auto-start the helper
 
-Use the compiled helper:
+By default, the extension will start the helper automatically the first time it needs to publish Discord activity.
+
+This behavior is controlled by:
+
+```dotenv
+PI_PRESENCE_AUTOSTART_HELPER=true
+```
+
+For most users, this is the easiest option because there is no separate startup step after installation.
+
+### Optional: foreground / terminal session
+
+If you prefer to run the helper explicitly, use the compiled helper:
 
 ```bash
 npm start
@@ -184,7 +197,13 @@ Or for live TypeScript development:
 npm run dev:helper
 ```
 
-### Background service
+To disable auto-start and require manual startup, set:
+
+```dotenv
+PI_PRESENCE_AUTOSTART_HELPER=false
+```
+
+### Optional: background service
 
 If you want the helper to stay running outside a dev terminal, follow:
 
@@ -231,7 +250,6 @@ If you are installing this on your own machine for the first time, this is the p
 npm install
 npm run build
 pi install .
-npm start
 ```
 
 Then:
@@ -275,7 +293,7 @@ PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 ```
 
-Then restart the helper.
+Then restart the helper, or let Pi auto-start a fresh helper instance on the next session if auto-start remains enabled.
 
 ### `.env` changes do not seem to apply
 

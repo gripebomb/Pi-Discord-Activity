@@ -25,7 +25,9 @@ pwsh ./setup.ps1
 
 ## Prerequisites
 
-Before creating a service, make sure these steps already work manually:
+Before creating a service, make sure the package already works either with the default auto-start flow or with a manually started helper.
+
+Manual sanity-check example:
 
 ```bash
 npm install
@@ -44,6 +46,7 @@ PI_PRESENCE_PORT=42666
 PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_AUTOSTART_HELPER=false
 PI_PRESENCE_DEBUG=false
 ```
 

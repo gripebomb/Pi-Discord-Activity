@@ -12,6 +12,7 @@ import type {
 } from "@mariozechner/pi-coding-agent";
 import type { ActivityState, PresencePayload } from "../shared/types.js";
 import { PresenceState } from "./state.js";
+import { ensureHelperRunning, isHelperUnavailableError } from "./helper.js";
 import { publishPresence } from "./transport.js";
 
 const LOG_PREFIX = "[pi-discord-activity]";
@@ -36,6 +37,18 @@ export default function (pi: ExtensionAPI): void {
     try {
       await publishPresence(payload);
       log(reason, payloadSummary(payload));
+      return;
+    } catch (error) {
+      if (!isHelperUnavailableError(error)) {
+        console.error(`${LOG_PREFIX} Failed to publish presence for ${reason}`, error);
+        return;
+      }
+    }
+
+    try {
+      await ensureHelperRunning();
+      await publishPresence(payload);
+      log(`${reason}:autostart`, payloadSummary(payload));
     } catch (error) {
       console.error(`${LOG_PREFIX} Failed to publish presence for ${reason}`, error);
     }
@@ -52,6 +65,12 @@ export default function (pi: ExtensionAPI): void {
       startedAt: Math.floor(Date.now() / 1000),
       state: "starting"
     });
+
+    try {
+      await ensureHelperRunning();
+    } catch (error) {
+      log("helper_autostart_failed", { error: error instanceof Error ? error.message : String(error) });
+    }
 
     log("session_start", {
       reason: event.reason,

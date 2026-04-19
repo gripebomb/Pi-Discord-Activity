@@ -6,6 +6,7 @@ export interface PresenceConfig {
   privacyMode: boolean;
   includeProjectName: boolean;
   debounceMs: number;
+  autostartHelper: boolean;
   debugLogging: boolean;
 }
 
@@ -17,5 +18,6 @@ export const defaultConfig: PresenceConfig = {
   privacyMode: process.env.PI_PRESENCE_PRIVACY_MODE !== "false",
   includeProjectName: process.env.PI_PRESENCE_INCLUDE_PROJECT === "true",
   debounceMs: Number(process.env.PI_PRESENCE_DEBOUNCE_MS ?? "2000"),
+  autostartHelper: process.env.PI_PRESENCE_AUTOSTART_HELPER !== "false",
   debugLogging: process.env.PI_PRESENCE_DEBUG === "true"
 };

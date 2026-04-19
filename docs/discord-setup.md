@@ -66,7 +66,7 @@ Example `.env` file in the repo root:
 DISCORD_RPC_CLIENT_ID=123456789012345678
 ```
 
-The helper started with `npm start` or `node dist/cli/run-helper.js` will read `.env` automatically.
+The helper will read `.env` automatically whether it is started manually (`npm start`, `node dist/cli/run-helper.js`) or auto-started by the extension.
 
 > Screenshot placeholder: Discord application **General Information** page with **Application ID** highlighted.
 
@@ -121,6 +121,7 @@ PI_PRESENCE_PORT=42666
 PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_AUTOSTART_HELPER=true
 PI_PRESENCE_DEBUG=false
 ```
 
@@ -133,6 +134,7 @@ export PI_PRESENCE_PORT="42666"
 export PI_PRESENCE_PRIVACY_MODE="true"
 export PI_PRESENCE_INCLUDE_PROJECT="false"
 export PI_PRESENCE_DEBOUNCE_MS="2000"
+export PI_PRESENCE_AUTOSTART_HELPER="true"
 export PI_PRESENCE_DEBUG="false"
 ```
 
@@ -193,14 +195,14 @@ Use the desktop app. Rich Presence depends on the local RPC connection.
 
 ### Forgetting to restart the helper after changing configuration
 
-If you change `DISCORD_RPC_CLIENT_ID` or privacy settings, restart the helper or restart the service so it reloads the environment.
+If you change `DISCORD_RPC_CLIENT_ID`, auto-start behavior, or privacy settings, restart the helper or restart the service so it reloads the environment.
 
 ## Quick verification
 
 After configuration:
 
-1. Start the helper with `npm start`
-2. Install the extension with `pi install .`
+1. Install the extension with `pi install .` (or `pi install npm:pi-discord-activity` for the published package)
+2. Leave `PI_PRESENCE_AUTOSTART_HELPER=true` for the default auto-start path, or start the helper manually with `npm start`
 3. Start Pi and do something simple like asking a question or triggering a tool call
 4. Watch Discord for activity updates
 

@@ -1,6 +1,6 @@
 {
   "name": "pi-discord-activity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Discord activity extension and helper for the Pi coding agent.",
   "type": "module",
   "main": "dist/helper/index.js",

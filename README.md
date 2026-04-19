@@ -21,7 +21,7 @@ This project is split into two pieces:
 
 ### Published package install
 
-For most users, the simplest path is to install the published package into Pi and then run the helper.
+For most users, the simplest path is to install the published package into Pi and let the extension auto-start the helper when Pi activity is first published.
 
 1. **Install the Pi package**
 
@@ -29,37 +29,40 @@ For most users, the simplest path is to install the published package into Pi an
    pi install npm:pi-discord-activity
    ```
 
-2. **Start the helper**
+2. **Open Pi and use it normally**
 
-   If the package was installed globally, the helper binary should be available as:
-
-   ```bash
-   pi-discord-activity-helper
-   ```
-
-   If you prefer to run it directly from npm without a global helper install, use:
-
-   ```bash
-   npx pi-discord-activity-helper
-   ```
+   With the default configuration, the extension will auto-start the helper the first time it needs to publish Discord activity.
 
 3. **Verify the integration**
 
    Follow [docs/verification.md](./docs/verification.md) for the Discord-side checks.
 
+If you prefer explicit process management, you can still start the helper manually:
+
+```bash
+pi-discord-activity-helper
+# or
+npx pi-discord-activity-helper
+```
+
 ### Direct npm install
 
-If you want the helper available directly from npm on your PATH:
+If you want the helper binary available directly from npm on your PATH:
 
 ```bash
 npm install -g pi-discord-activity
-pi-discord-activity-helper
 ```
 
-This installs the helper binary, but you should still install the Pi package so Pi loads the extension:
+You should still install the Pi package so Pi loads the extension:
 
 ```bash
 pi install npm:pi-discord-activity
+```
+
+Then either let Pi auto-start the helper, or run it yourself:
+
+```bash
+pi-discord-activity-helper
 ```
 
 ### Local repo / development install
@@ -95,7 +98,9 @@ pi install npm:pi-discord-activity
    ln -s "$(pwd)/dist/extension/index.js" ~/.pi/agent/extensions/pi-discord-activity.js
    ```
 
-4. **Start the helper**
+4. **Start Pi and let the helper auto-start**
+
+   The extension will start the helper automatically on the first publish attempt. If you prefer to run it yourself during development, you can still use:
 
    ```bash
    npm start
@@ -143,12 +148,15 @@ Recommended for most users:
 
 ```bash
 pi install npm:pi-discord-activity
-pi-discord-activity-helper
 ```
 
-Alternative helper startup without a global binary:
+Then open Pi and let the extension auto-start the helper on first use.
+
+Manual helper startup is still available if you want it:
 
 ```bash
+pi-discord-activity-helper
+# or
 npx pi-discord-activity-helper
 ```
 
@@ -156,7 +164,6 @@ If you want the helper installed globally through npm as well:
 
 ```bash
 npm install -g pi-discord-activity
-pi-discord-activity-helper
 ```
 
 ### Install from the local repo
@@ -165,8 +172,9 @@ pi-discord-activity-helper
 npm install
 npm run build
 pi install .
-npm start
 ```
+
+Then open Pi and let the extension auto-start the helper, or run `npm start` manually if you prefer.
 
 ### Guided setup scripts
 
@@ -211,8 +219,11 @@ PI_PRESENCE_HOST=127.0.0.1
 PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_AUTOSTART_HELPER=true
 PI_PRESENCE_DEBUG=false
 ```
+
+Set `PI_PRESENCE_AUTOSTART_HELPER=false` if you want to disable auto-start and manage the helper manually or through an OS service.
 
 ### Privacy defaults
 

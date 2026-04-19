@@ -38,6 +38,7 @@ PI_PRESENCE_PORT=42666
 PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_AUTOSTART_HELPER=true
 PI_PRESENCE_DEBUG=true
 ```
 
@@ -92,6 +93,14 @@ This validates the local codebase before you move into runtime checks.
 The helper is the process that talks to Discord RPC and exposes the local `/presence` endpoint.
 
 ### 2.1 Start the helper
+
+You now have two valid verification modes.
+
+**Mode A: auto-start (default)**
+
+Leave `PI_PRESENCE_AUTOSTART_HELPER=true`, start Pi, and let the extension bring up the helper automatically on first publish.
+
+**Mode B: manual helper startup**
 
 ```bash
 npm start
@@ -203,9 +212,9 @@ Discord activity requires the desktop application, not the browser-only client.
 
 ### 4.2 Keep helper logs visible
 
-Run the helper in a terminal with debug logging enabled, or tail the service log if you are using `launchd`, `systemd`, or NSSM.
+If you want explicit helper logs, either start the helper manually in a terminal with debug logging enabled, or tail the service log if you are using `launchd`, `systemd`, or NSSM.
 
-Examples:
+Manual example:
 
 ```bash
 npm start

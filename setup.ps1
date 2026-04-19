@@ -102,6 +102,7 @@ PI_PRESENCE_PORT=42666
 PI_PRESENCE_PRIVACY_MODE=true
 PI_PRESENCE_INCLUDE_PROJECT=false
 PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_AUTOSTART_HELPER=true
 PI_PRESENCE_DEBUG=false
 "@ | Set-Content -Path (Join-Path $ProjectRoot '.env') -Encoding utf8
 Write-Status 'Wrote .env'
