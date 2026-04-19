@@ -9,12 +9,14 @@ type RpcClientLike = {
   login(args: { clientId: string }): Promise<unknown>;
   setActivity(activity: Record<string, unknown>): Promise<unknown>;
   clearActivity(): Promise<unknown>;
-  destroy?(): void;
+  destroy?(): void | Promise<void>;
 };
 
 type RpcClientFactory = () => RpcClientLike;
 type Scheduler = typeof setTimeout;
 type Canceler = typeof clearTimeout;
+
+const PRESENCE_KEEPALIVE_MS = 15_000;
 
 export class DiscordPresenceClient {
   private client: RpcClientLike;
@@ -24,14 +26,17 @@ export class DiscordPresenceClient {
   private ready = false;
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private presenceKeepaliveTimer: ReturnType<typeof setTimeout> | null = null;
   private connectPromise: Promise<void> | null = null;
   private pendingPresence: PresencePayload | null = null;
   private needsClientRefresh = false;
+  private readonly presenceKeepaliveMs: number;
 
   constructor(
     clientOrFactory: RpcClientLike | RpcClientFactory = () => new RPC.Client({ transport: "ipc" }),
     schedule: Scheduler = setTimeout,
-    cancel: Canceler = clearTimeout
+    cancel: Canceler = clearTimeout,
+    presenceKeepaliveMs = PRESENCE_KEEPALIVE_MS
   ) {
     this.createClient =
       typeof clientOrFactory === "function"
@@ -39,6 +44,7 @@ export class DiscordPresenceClient {
         : () => clientOrFactory as RpcClientLike;
     this.schedule = schedule;
     this.cancel = cancel;
+    this.presenceKeepaliveMs = presenceKeepaliveMs;
     this.client = this.createClient();
     this.bindListeners(this.client);
   }
@@ -54,12 +60,25 @@ export class DiscordPresenceClient {
 
     if (!this.connectPromise) {
       const activeClient = this.client;
-      this.connectPromise = activeClient
+      const connectAttempt = activeClient
         .login({ clientId: defaultConfig.rpcClientId })
         .then(() => undefined)
+        .catch((error) => {
+          if (activeClient === this.client) {
+            this.ready = false;
+            this.needsClientRefresh = true;
+          } else {
+            debugLog("Ignoring login failure from stale Discord RPC client", error);
+          }
+          throw error;
+        })
         .finally(() => {
-          this.connectPromise = null;
+          if (this.connectPromise === connectAttempt) {
+            this.connectPromise = null;
+          }
         });
+
+      this.connectPromise = connectAttempt;
     }
 
     await this.connectPromise;
@@ -73,8 +92,10 @@ export class DiscordPresenceClient {
         await this.connect();
       } catch (error) {
         debugLog("Discord RPC not ready, queued presence update", error);
-        this.scheduleReconnect();
-        return;
+        if (!this.ready) {
+          this.scheduleReconnect();
+          return;
+        }
       }
     }
 
@@ -85,6 +106,7 @@ export class DiscordPresenceClient {
 
     try {
       await this.client.setActivity(buildActivity(payload));
+      this.schedulePresenceKeepalive();
     } catch (error) {
       this.handleDisconnect("setActivity_failed", error);
     }
@@ -96,6 +118,11 @@ export class DiscordPresenceClient {
     if (this.reconnectTimer) {
       this.cancel(this.reconnectTimer);
       this.reconnectTimer = null;
+    }
+
+    if (this.presenceKeepaliveTimer) {
+      this.cancel(this.presenceKeepaliveTimer);
+      this.presenceKeepaliveTimer = null;
     }
 
     if (!this.ready) {
@@ -111,6 +138,11 @@ export class DiscordPresenceClient {
 
   private bindListeners(client: RpcClientLike): void {
     client.on("ready", () => {
+      if (client !== this.client) {
+        debugLog("Ignoring ready event from stale Discord RPC client");
+        return;
+      }
+
       this.ready = true;
       this.reconnectAttempts = 0;
       this.needsClientRefresh = false;
@@ -121,14 +153,25 @@ export class DiscordPresenceClient {
       }
 
       debugLog("Discord RPC connected");
+      this.schedulePresenceKeepalive();
       void this.flushPendingPresence();
     });
 
     client.on("disconnected", (...args: any[]) => {
+      if (client !== this.client) {
+        debugLog("Ignoring disconnect from stale Discord RPC client", ...args);
+        return;
+      }
+
       this.handleDisconnect("disconnected", ...args);
     });
 
     client.on("error", (...args: any[]) => {
+      if (client !== this.client) {
+        debugLog("Ignoring error from stale Discord RPC client", ...args);
+        return;
+      }
+
       this.handleDisconnect("error", ...args);
     });
   }
@@ -174,20 +217,60 @@ export class DiscordPresenceClient {
       await this.connect();
     } catch (error) {
       debugLog("Reconnect attempt failed", error);
-      this.scheduleReconnect();
+      if (!this.ready) {
+        this.scheduleReconnect();
+      }
     }
   }
 
   private refreshClient(): void {
+    const previousClient = this.client;
+
     try {
-      this.client.destroy?.();
-    } catch {
-      // best effort cleanup only
+      const destroyResult = previousClient.destroy?.();
+      if (destroyResult && typeof (destroyResult as Promise<void>).catch === "function") {
+        void (destroyResult as Promise<void>).catch((error) => {
+          logDestroyFailure(error);
+        });
+      }
+    } catch (error) {
+      logDestroyFailure(error);
     }
 
     this.client = this.createClient();
     this.bindListeners(this.client);
     this.needsClientRefresh = false;
+  }
+
+  private schedulePresenceKeepalive(): void {
+    if (this.presenceKeepaliveTimer || this.pendingPresence === null) {
+      return;
+    }
+
+    this.presenceKeepaliveTimer = this.schedule(() => {
+      this.presenceKeepaliveTimer = null;
+      void this.runPresenceKeepalive();
+    }, this.presenceKeepaliveMs);
+  }
+
+  private async runPresenceKeepalive(): Promise<void> {
+    if (!this.pendingPresence) {
+      return;
+    }
+
+    if (!this.ready) {
+      await this.attemptReconnect();
+      this.schedulePresenceKeepalive();
+      return;
+    }
+
+    try {
+      await this.client.setActivity(buildActivity(this.pendingPresence));
+    } catch (error) {
+      this.handleDisconnect("presence_keepalive_failed", error);
+    }
+
+    this.schedulePresenceKeepalive();
   }
 
   private async flushPendingPresence(): Promise<void> {
@@ -197,6 +280,7 @@ export class DiscordPresenceClient {
 
     try {
       await this.client.setActivity(buildActivity(this.pendingPresence));
+      this.schedulePresenceKeepalive();
     } catch (error) {
       this.handleDisconnect("flushPendingPresence_failed", error);
     }
@@ -233,6 +317,18 @@ export function humanizeState(state: PresencePayload["state"]): string {
 
 export function normalizeKey(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9_]/g, "-");
+}
+
+function isIgnorableDestroyFailure(error: unknown): boolean {
+  return error instanceof TypeError && error.message.includes("Cannot read properties of null") && error.message.includes("write");
+}
+
+function logDestroyFailure(error: unknown): void {
+  if (isIgnorableDestroyFailure(error)) {
+    return;
+  }
+
+  debugLog("Ignoring Discord RPC client destroy failure", error);
 }
 
 function debugLog(message: string, ...details: unknown[]): void {

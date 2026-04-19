@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { PresencePayload } from "../../src/shared/types.js";
-import { createPresenceHandler, performShutdown } from "../../src/helper/index.js";
+import { createPresenceHandler, isRecoverableDiscordRuntimeError, performShutdown } from "../../src/helper/index.js";
 
 function samplePayload(overrides: Partial<PresencePayload> = {}): PresencePayload {
   return {
@@ -80,4 +80,14 @@ test("performShutdown flushes pending updates, clears presence, waits, and exits
   assert.equal(clearCalls, 1);
   assert.equal(slept, 100);
   assert.equal(exitCode, 1);
+});
+
+test("isRecoverableDiscordRuntimeError recognizes Discord IPC disconnect failures", () => {
+  assert.equal(isRecoverableDiscordRuntimeError(new Error("Could not connect")), true);
+  assert.equal(isRecoverableDiscordRuntimeError(new Error("connection closed")), true);
+  assert.equal(
+    isRecoverableDiscordRuntimeError({ message: "fetch failed", cause: { code: "ECONNREFUSED" } }),
+    true
+  );
+  assert.equal(isRecoverableDiscordRuntimeError(new Error("totally unrelated bug")), false);
 });

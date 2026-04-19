@@ -1,6 +1,6 @@
 ---
 phase: 03-install-docs-verification
-verified: 2026-04-19T11:10:00Z
+verified: 2026-04-19T13:45:00Z
 status: passed
 score: 5/5 must-haves verified
 warnings:
@@ -10,7 +10,7 @@ warnings:
 # Phase 3: Install + Docs + Verification Report
 
 **Phase Goal:** Make the integration installable via Pi, with clear setup instructions and a reproducible verification flow.
-**Verified:** 2026-04-19T11:10:00Z
+**Verified:** 2026-04-19T13:45:00Z
 **Status:** passed
 
 ## Goal Achievement
@@ -66,7 +66,7 @@ warnings:
 ## Notes and Warnings
 
 - `pwsh` is not available in this environment, so the PowerShell scripts were not executed locally. Their structure mirrors the Unix automation and was reviewed for consistency, but Windows runtime execution still needs confirmation in a Windows or PowerShell-enabled environment.
-- Live Discord desktop rendering is already covered as a manual verification workflow in `docs/verification.md`; this phase focused on making the install/docs path reproducible and packaging-complete.
+- The manual reconnect workflow documented in `docs/verification.md` has now been exercised successfully in a live local Discord session: the helper stayed up across Discord shutdown/reopen and reconnected when Discord returned.
 
 ## Gaps Summary
 
@@ -83,5 +83,5 @@ No implementation gaps were found for the Phase 3 install/docs goals. Remaining 
 **Total verification time:** 20 min
 
 ---
-*Verified: 2026-04-19T11:10:00Z*
+*Verified: 2026-04-19T13:45:00Z*
 *Verifier: pi coding agent*
