@@ -14,7 +14,7 @@ import type { ActivityState, PresencePayload } from "../shared/types.js";
 import { PresenceState } from "./state.js";
 import { publishPresence } from "./transport.js";
 
-const LOG_PREFIX = "[pi-discord-presence]";
+const LOG_PREFIX = "[pi-discord-activity]";
 const EDITING_TOOLS = new Set(["edit", "write"]);
 const DEBUG_LOGGING = process.env.PI_PRESENCE_DEBUG === "true";
 

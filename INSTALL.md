@@ -1,6 +1,6 @@
-# Install pi-discord-presence
+# Install pi-discord-activity
 
-This guide walks through installing the Pi extension and the local helper so Discord Rich Presence reflects real Pi activity.
+This guide walks through installing the Pi extension and the local helper so Discord activity reflects real Pi activity.
 
 If you want the shortest path:
 
@@ -46,8 +46,8 @@ Optional but useful:
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/your-username/pi-discord-presence.git
-cd pi-discord-presence
+git clone https://github.com/gripebomb/pi-discord-activity.git
+cd pi-discord-activity
 npm install
 ```
 
@@ -147,7 +147,7 @@ Use this only if you want a direct file-based link for local experimentation.
 
 ```bash
 mkdir -p ~/.pi/agent/extensions
-ln -s "$(pwd)/dist/extension/index.js" ~/.pi/agent/extensions/pi-discord-presence.js
+ln -s "$(pwd)/dist/extension/index.js" ~/.pi/agent/extensions/pi-discord-activity.js
 ```
 
 This gives you an explicit extension file in the local Pi extensions directory.
@@ -163,7 +163,7 @@ npm pack
 That produces a tarball such as:
 
 ```text
-pi-discord-presence-0.1.0.tgz
+pi-discord-activity-0.1.0.tgz
 ```
 
 The tarball is useful for inspecting the packaged contents or for advanced distribution workflows. For day-to-day local setup, `pi install .` from the repo root is simpler.
@@ -205,7 +205,7 @@ Before you verify anything else:
 3. Leave it open
 4. Make sure you are not relying on the web-only Discord client
 
-The helper can run without Discord, but no Rich Presence appears until the desktop client is available.
+The helper can run without Discord, but no Discord activity appears until the desktop client is available.
 
 ## Step 8: Verify the full flow
 

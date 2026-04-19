@@ -1,6 +1,6 @@
-# pi-discord-presence
+# pi-discord-activity
 
-A repo-ready package for adding **Discord Rich Presence** support to the **Pi coding agent**.
+A repo-ready package for adding **Discord activity** support to the **Pi coding agent**.
 
 This project is split into two pieces:
 
@@ -47,7 +47,7 @@ This project is split into two pieces:
 
    ```bash
    mkdir -p ~/.pi/agent/extensions
-   ln -s "$(pwd)/dist/extension/index.js" ~/.pi/agent/extensions/pi-discord-presence.js
+   ln -s "$(pwd)/dist/extension/index.js" ~/.pi/agent/extensions/pi-discord-activity.js
    ```
 
 4. **Start the helper**
@@ -69,7 +69,7 @@ This project is split into two pieces:
 This is a working Pi extension/helper package with:
 
 - ✅ real Pi extension integration
-- ✅ Discord Rich Presence transport and reconnect handling
+- ✅ Discord activity transport and reconnect handling
 - ✅ a built-in default Discord application ID for low-friction setup
 - ✅ `pi install .` package installation support
 - ✅ setup, service, and verification documentation

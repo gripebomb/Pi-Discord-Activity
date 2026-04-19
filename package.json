@@ -1,12 +1,11 @@
 {
-  "name": "pi-discord-presence",
+  "name": "pi-discord-activity",
   "version": "0.1.0",
-  "description": "Discord Rich Presence extension and helper for the Pi coding agent.",
-  "private": true,
+  "description": "Discord activity extension and helper for the Pi coding agent.",
   "type": "module",
   "main": "dist/helper/index.js",
   "bin": {
-    "pi-discord-presence-helper": "dist/cli/run-helper.js"
+    "pi-discord-activity-helper": "dist/cli/run-helper.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -17,6 +16,16 @@
     "test": "tsx --test --test-concurrency=1 tests/**/*.test.ts",
     "prepare": "npm run build"
   },
+  "files": [
+    "dist",
+    "src",
+    "docs",
+    "scripts",
+    "INSTALL.md",
+    "README.md",
+    "setup.sh",
+    "setup.ps1"
+  ],
   "keywords": [
     "pi",
     "pi-package",
@@ -26,6 +35,14 @@
     "coding-agent"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gripebomb/pi-discord-activity.git"
+  },
+  "homepage": "https://github.com/gripebomb/pi-discord-activity#readme",
+  "bugs": {
+    "url": "https://github.com/gripebomb/pi-discord-activity/issues"
+  },
   "engines": {
     "node": ">=20"
   },
@@ -46,6 +63,9 @@
     "@mariozechner/pi-coding-agent": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "pi": {
     "extensions": [

@@ -1,11 +1,11 @@
-# Verification guide for pi-discord-presence
+# Verification guide for pi-discord-activity
 
 This guide walks through a reproducible end-to-end check of the package so you can confirm:
 
 - the helper starts successfully
 - the extension can be installed with `pi install .`
 - Pi activity reaches the helper
-- Discord Rich Presence updates as expected
+- Discord activity updates as expected
 - privacy defaults behave correctly
 - the helper survives normal restart scenarios
 
@@ -57,7 +57,7 @@ node -e "const pkg=require('./package.json'); console.log(pkg.name); console.log
 
 Expected results:
 
-- package name prints `pi-discord-presence`
+- package name prints `pi-discord-activity`
 - `pi.extensions` includes `./src/extension/index.ts`
 - `pi-package` is present in `keywords`
 
@@ -199,7 +199,7 @@ This phase is the real product check.
 
 ### 4.1 Make sure Discord desktop is open
 
-Rich Presence requires the desktop application, not the browser-only client.
+Discord activity requires the desktop application, not the browser-only client.
 
 ### 4.2 Keep helper logs visible
 
@@ -214,13 +214,13 @@ npm start
 macOS service log:
 
 ```bash
-tail -f /tmp/pi-discord-presence.log
+tail -f /tmp/pi-discord-activity.log
 ```
 
 Linux service log:
 
 ```bash
-journalctl --user -u pi-discord-presence.service -f
+journalctl --user -u pi-discord-activity.service -f
 ```
 
 ### 4.3 Trigger a new Pi session
@@ -358,19 +358,19 @@ If you installed a background service:
 macOS:
 
 ```bash
-launchctl kickstart -k "gui/$(id -u)/pi.discord.presence"
+launchctl kickstart -k "gui/$(id -u)/pi.discord.activity"
 ```
 
 Linux:
 
 ```bash
-systemctl --user restart pi-discord-presence.service
+systemctl --user restart pi-discord-activity.service
 ```
 
 Windows (NSSM):
 
 ```powershell
-nssm restart PiDiscordPresence
+nssm restart PiDiscordActivity
 ```
 
 Expected result:

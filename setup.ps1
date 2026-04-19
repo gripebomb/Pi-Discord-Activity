@@ -9,12 +9,12 @@ param(
 
 $DefaultClientId = '1495329514417426522'
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ServiceName = 'PiDiscordPresence'
-$LogPath = Join-Path $env:TEMP 'pi-discord-presence.log'
+$ServiceName = 'PiDiscordActivity'
+$LogPath = Join-Path $env:TEMP 'pi-discord-activity.log'
 
 function Write-Banner {
     Write-Host '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' -ForegroundColor Cyan
-    Write-Host ' GSD ► PI-DISCORD-PRESENCE WINDOWS SETUP' -ForegroundColor Cyan
+    Write-Host ' GSD ► PI-DISCORD-ACTIVITY WINDOWS SETUP' -ForegroundColor Cyan
     Write-Host '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' -ForegroundColor Cyan
 }
 
@@ -141,7 +141,7 @@ if (-not $SkipService) {
         & nssm install $ServiceName $nodePath $helperPath | Out-Null
         & nssm set $ServiceName AppDirectory $ProjectRoot | Out-Null
         & nssm set $ServiceName AppStdout $LogPath | Out-Null
-        & nssm set $ServiceName AppStderr (Join-Path $env:TEMP 'pi-discord-presence-error.log') | Out-Null
+        & nssm set $ServiceName AppStderr (Join-Path $env:TEMP 'pi-discord-activity-error.log') | Out-Null
         & nssm set $ServiceName AppRestartDelay 5000 | Out-Null
         & nssm start $ServiceName | Out-Null
 
@@ -156,7 +156,7 @@ Write-Host '━━━━━━━━━━━━━━━━━━━━━━�
 Write-Host ' GSD ► SETUP COMPLETE' -ForegroundColor Cyan
 Write-Host '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' -ForegroundColor Cyan
 Write-Host ''
-Write-Status 'pi-discord-presence setup finished'
+Write-Status 'pi-discord-activity setup finished'
 Write-Host 'Next steps:' -ForegroundColor White
 Write-Host '1. Start helper: npm start' -ForegroundColor White
 Write-Host '2. Verify install: pwsh ./scripts/verify-installation.ps1' -ForegroundColor White

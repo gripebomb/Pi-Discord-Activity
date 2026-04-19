@@ -6,7 +6,7 @@ param(
 
 $ProjectRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $TempPort = if ($env:PI_PRESENCE_VERIFY_PORT) { [int]$env:PI_PRESENCE_VERIFY_PORT } else { 42667 }
-$LogFile = Join-Path $env:TEMP 'pi-discord-presence-verify.log'
+$LogFile = Join-Path $env:TEMP 'pi-discord-activity-verify.log'
 $HelperProcess = $null
 $Total = 0
 $Passed = 0
@@ -15,7 +15,7 @@ $Skipped = 0
 
 function Write-Banner {
     Write-Host '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' -ForegroundColor Cyan
-    Write-Host ' GSD ► PI-DISCORD-PRESENCE WINDOWS VERIFICATION' -ForegroundColor Cyan
+    Write-Host ' GSD ► PI-DISCORD-ACTIVITY WINDOWS VERIFICATION' -ForegroundColor Cyan
     Write-Host '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' -ForegroundColor Cyan
 }
 

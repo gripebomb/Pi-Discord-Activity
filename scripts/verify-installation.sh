@@ -7,7 +7,7 @@ TEMP_PORT="${PI_PRESENCE_VERIFY_PORT:-42667}"
 EXERCISE_PI_INSTALL=false
 STARTED_HELPER=false
 HELPER_PID=""
-LOG_FILE="${TMPDIR:-/tmp}/pi-discord-presence-verify.log"
+LOG_FILE="${TMPDIR:-/tmp}/pi-discord-activity-verify.log"
 TOTAL=0
 PASSED=0
 FAILED=0
@@ -48,7 +48,7 @@ done
 
 banner() {
   printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-  printf " GSD ► PI-DISCORD-PRESENCE VERIFICATION\n"
+  printf " GSD ► PI-DISCORD-ACTIVITY VERIFICATION\n"
   printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
 }
 

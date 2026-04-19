@@ -336,5 +336,5 @@ function debugLog(message: string, ...details: unknown[]): void {
     return;
   }
 
-  console.log(`[pi-discord-presence] ${message}`, ...details);
+  console.log(`[pi-discord-activity] ${message}`, ...details);
 }

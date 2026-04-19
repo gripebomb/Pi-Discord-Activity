@@ -1,6 +1,6 @@
-# Discord application setup for pi-discord-presence
+# Discord application setup for pi-discord-activity
 
-This guide explains how to use **pi-discord-presence** with either the built-in default Discord Rich Presence application or your own custom Discord application.
+This guide explains how to use **pi-discord-activity** with either the built-in default Discord activity application or your own custom Discord application.
 
 If you want the fastest path, you can skip most of this guide and use the default client ID that already ships with the package:
 
@@ -8,7 +8,7 @@ If you want the fastest path, you can skip most of this guide and use the defaul
 
 That default works well for local verification and everyday use. You only need a custom Discord application if you want your own branding, your own image assets, or you want to control the application identity shown in Discord.
 
-> Screenshot placeholder: Discord desktop app showing a working Pi Rich Presence session.
+> Screenshot placeholder: Discord desktop app showing a working Pi activity session.
 
 ## What this integration needs from Discord
 

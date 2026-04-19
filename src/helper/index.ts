@@ -131,7 +131,7 @@ export async function startHelper(): Promise<void> {
 
   void discord.connect().catch((error) => {
     if (defaultConfig.debugLogging) {
-      console.log("[pi-discord-presence] Discord RPC unavailable at startup; helper will retry on next presence update", error);
+      console.log("[pi-discord-activity] Discord RPC unavailable at startup; helper will retry on next presence update", error);
     }
   });
 
@@ -143,20 +143,20 @@ export async function startHelper(): Promise<void> {
   });
   process.on("uncaughtException", (error) => {
     if (isRecoverableDiscordRuntimeError(error)) {
-      console.warn("[pi-discord-presence] Recoverable Discord runtime exception:", error);
+      console.warn("[pi-discord-activity] Recoverable Discord runtime exception:", error);
       return;
     }
 
-    console.error("[pi-discord-presence] Uncaught exception:", error);
+    console.error("[pi-discord-activity] Uncaught exception:", error);
     void performShutdown(discord, flushPendingUpdate, process.exit, 100, undefined, 1, "uncaughtException");
   });
   process.on("unhandledRejection", (reason, promise) => {
     if (isRecoverableDiscordRuntimeError(reason)) {
-      console.warn("[pi-discord-presence] Recoverable Discord runtime rejection:", reason);
+      console.warn("[pi-discord-activity] Recoverable Discord runtime rejection:", reason);
       return;
     }
 
-    console.error("[pi-discord-presence] Unhandled rejection at:", promise, "reason:", reason);
+    console.error("[pi-discord-activity] Unhandled rejection at:", promise, "reason:", reason);
     void performShutdown(discord, flushPendingUpdate, process.exit, 100, undefined, 1, "unhandledRejection");
   });
 }

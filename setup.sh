@@ -17,7 +17,7 @@ NC='\033[0m'
 
 print_banner() {
   printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-  printf " GSD ► PI-DISCORD-PRESENCE SETUP\n"
+  printf " GSD ► PI-DISCORD-ACTIVITY SETUP\n"
   printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
 }
 
@@ -158,7 +158,7 @@ STOP_HINT="Ctrl+C"
 LOG_HINT="terminal output"
 
 setup_macos_service() {
-  local plist="$HOME/Library/LaunchAgents/pi.discord.presence.plist"
+  local plist="$HOME/Library/LaunchAgents/pi.discord.activity.plist"
   local node_path
   node_path="$(command -v node)"
 
@@ -169,7 +169,7 @@ setup_macos_service() {
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>pi.discord.presence</string>
+  <string>pi.discord.activity</string>
   <key>ProgramArguments</key>
   <array>
     <string>${node_path}</string>
@@ -182,26 +182,26 @@ setup_macos_service() {
   <key>KeepAlive</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>/tmp/pi-discord-presence.log</string>
+  <string>/tmp/pi-discord-activity.log</string>
   <key>StandardErrorPath</key>
-  <string>/tmp/pi-discord-presence-error.log</string>
+  <string>/tmp/pi-discord-activity-error.log</string>
 </dict>
 </plist>
 EOF
 
   launchctl bootout "gui/$(id -u)" "$plist" >/dev/null 2>&1 || true
   launchctl bootstrap "gui/$(id -u)" "$plist"
-  launchctl enable "gui/$(id -u)/pi.discord.presence" >/dev/null 2>&1 || true
-  launchctl kickstart -k "gui/$(id -u)/pi.discord.presence"
+  launchctl enable "gui/$(id -u)/pi.discord.activity" >/dev/null 2>&1 || true
+  launchctl kickstart -k "gui/$(id -u)/pi.discord.activity"
 
-  START_HINT='launchctl kickstart -k "gui/$(id -u)/pi.discord.presence"'
-  STOP_HINT='launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.presence.plist'
-  LOG_HINT='/tmp/pi-discord-presence.log'
+  START_HINT='launchctl kickstart -k "gui/$(id -u)/pi.discord.activity"'
+  STOP_HINT='launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.activity.plist'
+  LOG_HINT='/tmp/pi-discord-activity.log'
   status "Installed macOS launchd service"
 }
 
 setup_linux_service() {
-  local unit="$HOME/.config/systemd/user/pi-discord-presence.service"
+  local unit="$HOME/.config/systemd/user/pi-discord-activity.service"
   local node_path
   node_path="$(command -v node)"
 
@@ -210,7 +210,7 @@ setup_linux_service() {
   mkdir -p "$(dirname "$unit")"
   cat > "$unit" <<EOF
 [Unit]
-Description=Pi Discord Presence Helper
+Description=Pi Discord Activity Helper
 After=network.target
 
 [Service]
@@ -219,19 +219,19 @@ WorkingDirectory=${PROJECT_DIR}
 ExecStart=${node_path} ${PROJECT_DIR}/dist/cli/run-helper.js
 Restart=always
 RestartSec=5
-StandardOutput=append:/tmp/pi-discord-presence.log
-StandardError=append:/tmp/pi-discord-presence-error.log
+StandardOutput=append:/tmp/pi-discord-activity.log
+StandardError=append:/tmp/pi-discord-activity-error.log
 
 [Install]
 WantedBy=default.target
 EOF
 
   systemctl --user daemon-reload
-  systemctl --user enable --now pi-discord-presence.service
+  systemctl --user enable --now pi-discord-activity.service
 
-  START_HINT='systemctl --user start pi-discord-presence.service'
-  STOP_HINT='systemctl --user stop pi-discord-presence.service'
-  LOG_HINT='journalctl --user -u pi-discord-presence.service -f'
+  START_HINT='systemctl --user start pi-discord-activity.service'
+  STOP_HINT='systemctl --user stop pi-discord-activity.service'
+  LOG_HINT='journalctl --user -u pi-discord-activity.service -f'
   status "Installed Linux systemd user service"
 }
 
@@ -261,7 +261,7 @@ fi
 printf "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
 printf " GSD ► SETUP COMPLETE\n"
 printf "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
-status "pi-discord-presence setup finished"
+status "pi-discord-activity setup finished"
 printf "Next steps:\n"
 printf "1. Start helper: %s\n" "$START_HINT"
 printf "2. Stop helper: %s\n" "$STOP_HINT"

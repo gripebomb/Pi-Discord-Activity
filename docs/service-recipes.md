@@ -1,6 +1,6 @@
-# Service recipes for the pi-discord-presence helper
+# Service recipes for the pi-discord-activity helper
 
-This document shows how to run the helper as a background service so Discord Rich Presence keeps working without leaving a dev terminal open.
+This document shows how to run the helper as a background service so Discord activity keeps working without leaving a dev terminal open.
 
 The helper entrypoint is:
 
@@ -51,7 +51,7 @@ PI_PRESENCE_DEBUG=false
 
 In every recipe below, replace these placeholders with your own values:
 
-- `/absolute/path/to/pi-discord-presence`
+- `/absolute/path/to/pi-discord-activity`
 - the full path to your Node.js binary if your system does not already have a stable one
 
 You can find your Node path with:
@@ -74,22 +74,22 @@ This is the best default for macOS because it starts in your user session and do
 
 ```bash
 mkdir -p ~/Library/LaunchAgents
-cat > ~/Library/LaunchAgents/pi.discord.presence.plist <<'EOF'
+cat > ~/Library/LaunchAgents/pi.discord.activity.plist <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>pi.discord.presence</string>
+  <string>pi.discord.activity</string>
 
   <key>ProgramArguments</key>
   <array>
     <string>/absolute/path/to/node</string>
-    <string>/absolute/path/to/pi-discord-presence/dist/cli/run-helper.js</string>
+    <string>/absolute/path/to/pi-discord-activity/dist/cli/run-helper.js</string>
   </array>
 
   <key>WorkingDirectory</key>
-  <string>/absolute/path/to/pi-discord-presence</string>
+  <string>/absolute/path/to/pi-discord-activity</string>
 
   <key>RunAtLoad</key>
   <true/>
@@ -98,10 +98,10 @@ cat > ~/Library/LaunchAgents/pi.discord.presence.plist <<'EOF'
   <true/>
 
   <key>StandardOutPath</key>
-  <string>/tmp/pi-discord-presence.log</string>
+  <string>/tmp/pi-discord-activity.log</string>
 
   <key>StandardErrorPath</key>
-  <string>/tmp/pi-discord-presence-error.log</string>
+  <string>/tmp/pi-discord-activity-error.log</string>
 </dict>
 </plist>
 EOF
@@ -112,31 +112,31 @@ Because `WorkingDirectory` points at the repo root, the helper can read `.env` a
 ### Load and start the service
 
 ```bash
-launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.presence.plist
-launchctl enable "gui/$(id -u)/pi.discord.presence"
-launchctl kickstart -k "gui/$(id -u)/pi.discord.presence"
+launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.activity.plist
+launchctl enable "gui/$(id -u)/pi.discord.activity"
+launchctl kickstart -k "gui/$(id -u)/pi.discord.activity"
 ```
 
 If the service was already loaded and you changed the plist, reload it:
 
 ```bash
-launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.presence.plist 2>/dev/null || true
-launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.presence.plist
-launchctl kickstart -k "gui/$(id -u)/pi.discord.presence"
+launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.activity.plist 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.activity.plist
+launchctl kickstart -k "gui/$(id -u)/pi.discord.activity"
 ```
 
 ### Check status and logs
 
 ```bash
-launchctl print "gui/$(id -u)/pi.discord.presence"
-tail -f /tmp/pi-discord-presence.log
+launchctl print "gui/$(id -u)/pi.discord.activity"
+tail -f /tmp/pi-discord-activity.log
 ```
 
 ### Stop and remove the service
 
 ```bash
-launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.presence.plist
-rm ~/Library/LaunchAgents/pi.discord.presence.plist
+launchctl bootout "gui/$(id -u)" ~/Library/LaunchAgents/pi.discord.activity.plist
+rm ~/Library/LaunchAgents/pi.discord.activity.plist
 ```
 
 ## Linux: systemd user service
@@ -147,19 +147,19 @@ This is the recommended Linux path because it runs in the current user account a
 
 ```bash
 mkdir -p ~/.config/systemd/user
-cat > ~/.config/systemd/user/pi-discord-presence.service <<'EOF'
+cat > ~/.config/systemd/user/pi-discord-activity.service <<'EOF'
 [Unit]
-Description=Pi Discord Presence Helper
+Description=Pi Discord Activity Helper
 After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/absolute/path/to/pi-discord-presence
-ExecStart=/absolute/path/to/node /absolute/path/to/pi-discord-presence/dist/cli/run-helper.js
+WorkingDirectory=/absolute/path/to/pi-discord-activity
+ExecStart=/absolute/path/to/node /absolute/path/to/pi-discord-activity/dist/cli/run-helper.js
 Restart=always
 RestartSec=5
-StandardOutput=append:/tmp/pi-discord-presence.log
-StandardError=append:/tmp/pi-discord-presence-error.log
+StandardOutput=append:/tmp/pi-discord-activity.log
+StandardError=append:/tmp/pi-discord-activity-error.log
 
 [Install]
 WantedBy=default.target
@@ -172,27 +172,27 @@ Again, the working directory is important because the helper will look for `.env
 
 ```bash
 systemctl --user daemon-reload
-systemctl --user enable --now pi-discord-presence.service
+systemctl --user enable --now pi-discord-activity.service
 ```
 
 ### Check status and logs
 
 ```bash
-systemctl --user status pi-discord-presence.service
-journalctl --user -u pi-discord-presence.service -f
+systemctl --user status pi-discord-activity.service
+journalctl --user -u pi-discord-activity.service -f
 ```
 
 If you prefer plain files over journald, also inspect:
 
 ```bash
-tail -f /tmp/pi-discord-presence.log
+tail -f /tmp/pi-discord-activity.log
 ```
 
 ### Stop and remove the service
 
 ```bash
-systemctl --user disable --now pi-discord-presence.service
-rm ~/.config/systemd/user/pi-discord-presence.service
+systemctl --user disable --now pi-discord-activity.service
+rm ~/.config/systemd/user/pi-discord-activity.service
 systemctl --user daemon-reload
 ```
 
@@ -223,15 +223,15 @@ Or download it from <https://nssm.cc>.
 ### Create the service
 
 ```powershell
-$ProjectRoot = 'C:\absolute\path\to\pi-discord-presence'
+$ProjectRoot = 'C:\absolute\path\to\pi-discord-activity'
 $NodePath = (Get-Command node).Source
 $HelperPath = Join-Path $ProjectRoot 'dist\cli\run-helper.js'
-$ServiceName = 'PiDiscordPresence'
+$ServiceName = 'PiDiscordActivity'
 
 nssm install $ServiceName $NodePath $HelperPath
 nssm set $ServiceName AppDirectory $ProjectRoot
-nssm set $ServiceName AppStdout "$env:TEMP\pi-discord-presence.log"
-nssm set $ServiceName AppStderr "$env:TEMP\pi-discord-presence-error.log"
+nssm set $ServiceName AppStdout "$env:TEMP\pi-discord-activity.log"
+nssm set $ServiceName AppStderr "$env:TEMP\pi-discord-activity-error.log"
 nssm set $ServiceName AppRestartDelay 5000
 nssm start $ServiceName
 ```
@@ -241,15 +241,15 @@ With `AppDirectory` set to the repo root, the helper can read `.env` automatical
 ### Check status and logs
 
 ```powershell
-nssm status PiDiscordPresence
-Get-Content "$env:TEMP\pi-discord-presence.log" -Wait
+nssm status PiDiscordActivity
+Get-Content "$env:TEMP\pi-discord-activity.log" -Wait
 ```
 
 ### Stop and remove the service
 
 ```powershell
-nssm stop PiDiscordPresence
-nssm remove PiDiscordPresence confirm
+nssm stop PiDiscordActivity
+nssm remove PiDiscordActivity confirm
 ```
 
 ## Verification after service setup
@@ -303,7 +303,7 @@ Restart the service after changing `.env`.
 Make sure you enabled it with:
 
 ```bash
-systemctl --user enable --now pi-discord-presence.service
+systemctl --user enable --now pi-discord-activity.service
 ```
 
 If you need it to survive logout, also consider `loginctl enable-linger "$USER"`.
@@ -312,7 +312,7 @@ If you need it to survive logout, also consider `loginctl enable-linger "$USER"`
 
 Use the exact same label in all commands:
 
-- `pi.discord.presence`
+- `pi.discord.activity`
 
 Mismatch between the plist label and your `launchctl` command is a common cause of confusion.
 

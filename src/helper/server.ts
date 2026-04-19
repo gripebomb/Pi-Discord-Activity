@@ -23,7 +23,7 @@ export function createPresenceServer(
         await onPresence(parsed);
         res.writeHead(204).end();
       } catch (error) {
-        console.error("[pi-discord-presence] Failed to process presence update", error);
+        console.error("[pi-discord-activity] Failed to process presence update", error);
         res.writeHead(400).end("Bad Request");
       }
     });
