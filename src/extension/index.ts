@@ -16,6 +16,7 @@ import { publishPresence } from "./transport.js";
 
 const LOG_PREFIX = "[pi-discord-presence]";
 const EDITING_TOOLS = new Set(["edit", "write"]);
+const DEBUG_LOGGING = process.env.PI_PRESENCE_DEBUG === "true";
 
 export default function (pi: ExtensionAPI): void {
   const state = new PresenceState();
@@ -136,5 +137,9 @@ function payloadSummary(payload: PresencePayload) {
 }
 
 function log(event: string, details: Record<string, unknown>): void {
+  if (!DEBUG_LOGGING) {
+    return;
+  }
+
   console.log(`${LOG_PREFIX} ${event}`, details);
 }

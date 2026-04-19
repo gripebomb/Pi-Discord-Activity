@@ -18,13 +18,14 @@ This scaffold is split into two pieces:
 
 ## Status
 
-This is a **starter scaffold**, not a finished plugin.
-You will still need to:
+This is a working Pi extension/helper package with a built-in default Discord Rich Presence application ID.
+You can override that default with your own Discord application if you want custom branding or assets.
 
-1. create a Discord application in the Discord Developer Portal
-2. add Rich Presence image assets like `pi`, `openai`, `anthropic`, etc.
-3. replace the placeholder Pi extension hook registration with Pi's real extension API wiring
-4. package/install the extension in your Pi environment
+You may still want to:
+
+1. add Rich Presence image assets like `pi`, `openai`, `anthropic`, etc. to your own Discord app if you override the default
+2. package/install the extension in your Pi environment
+3. add additional install/service polish for your platform
 
 ## Requirements
 
@@ -58,26 +59,32 @@ The dev extension will publish a fake session start and a fake idle transition s
 
 ## Environment variables
 
-You can export these before running the helper:
+The package now ships with a built-in default Discord RPC Client ID:
+
+- `1495329514417426522`
+
+So `DISCORD_RPC_CLIENT_ID` is optional for normal use. Export it only if you want to override the default Discord application:
 
 ```bash
-export DISCORD_RPC_CLIENT_ID="YOUR_DISCORD_APP_CLIENT_ID"
+export DISCORD_RPC_CLIENT_ID="YOUR_OWN_DISCORD_APP_CLIENT_ID"
 export PI_PRESENCE_PORT="42666"
 export PI_PRESENCE_HOST="127.0.0.1"
 export PI_PRESENCE_PRIVACY_MODE="true"
 export PI_PRESENCE_INCLUDE_PROJECT="false"
 export PI_PRESENCE_DEBOUNCE_MS="2000"
+export PI_PRESENCE_DEBUG="false"
 ```
 
 ## Discord application setup
 
-Create a Discord application and note its **Client ID**.
-Then upload Rich Presence assets that match the image keys used in `src/helper/discord.ts`:
+By default, the package uses the built-in Discord application ID `1495329514417426522`, so most users do not need to create their own Discord application.
+
+If you want custom branding or your own Rich Presence assets, set `DISCORD_RPC_CLIENT_ID` to your own Discord Application ID and upload assets that match the image keys used in `src/helper/discord.ts`:
 
 - `pi`
 - provider image keys you plan to use, such as `openai`, `anthropic`, `google`
 
-If you do not upload matching assets, Discord may still connect, but image badges will not render correctly.
+If you do not upload matching assets, Discord may still connect, but image badges may not render correctly.
 
 ## Suggested Pi integration flow
 
@@ -153,13 +160,11 @@ That is a safer default for coding work.
 
 ## Next implementation steps
 
-1. wire the Pi extension to real Pi events
-2. confirm model/provider extraction from Pi session data
-3. create Discord assets
-4. test debounce behavior during rapid tool calls
-5. add config file loading
-6. add better multi-session handling
-7. add Windows/macOS/Linux service helpers
+1. expand install/setup docs
+2. document service/background-run options
+3. add config file loading
+4. add better multi-session handling
+5. add Windows/macOS/Linux service helpers
 
 ## License
 

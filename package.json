@@ -14,7 +14,7 @@
     "dev:helper": "tsx src/cli/run-helper.ts",
     "dev:extension": "tsx src/extension/index.ts",
     "start": "node dist/cli/run-helper.js",
-    "test": "tsx --test --test-concurrency=1 tests/**/*.test.ts", 
+    "test": "tsx --test --test-concurrency=1 tests/**/*.test.ts",
     "prepare": "npm run build"
   },
   "keywords": [

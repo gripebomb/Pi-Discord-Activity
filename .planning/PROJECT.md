@@ -32,7 +32,7 @@ Real Pi activity should appear reliably in Discord Rich Presence with minimal se
 
 ## Context
 
-This repository already contains a starter scaffold with a split architecture: a Pi-side extension publishes normalized presence payloads to a local helper daemon, and the helper owns the Discord RPC connection. The current gap is that the extension still uses placeholder hooks rather than Pi's real extension/package APIs. The project is intended to be a real Pi package/extension first, then later hardened and packaged for easier distribution.
+This repository contains a Pi-side extension that publishes normalized presence payloads to a local helper daemon, and the helper owns the Discord RPC connection. The package now ships with a built-in default Discord RPC Application ID so users can get running without creating their own Discord application first. Users can still override the application ID if they want custom branding or custom Rich Presence assets.
 
 The desired v1 Discord display is the useful default: Pi + provider/model + activity state. Privacy should remain opt-in for showing extra context like project names.
 
@@ -49,7 +49,8 @@ The desired v1 Discord display is the useful default: Pi + provider/model + acti
 | -------- | --------- | ------- |
 | Build real Pi integration before distribution polish | A real extension/package is the prerequisite for useful installation and distribution work | - Pending |
 | Use privacy-first defaults | Coding activity may contain sensitive project context; safer defaults reduce accidental leakage | - Pending |
-| v1 presence shows Pi + provider/model + activity state | This is the most useful default signal without overexposing local project details | - Pending |
+| v1 presence shows Pi + provider/model + activity state | This is the most useful default signal without overexposing local project details | - Active |
+| Ship a built-in default Discord RPC client ID | Removes unnecessary setup friction while still allowing overrides for custom branding | - Active |
 
 ## Evolution
 
@@ -69,4 +70,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-19 after initialization*
+*Last updated: 2026-04-19 after Phase 2 runtime polish*

@@ -20,6 +20,7 @@ class FakeRpcClient {
   loginCalls = 0;
   activities: Array<Record<string, unknown>> = [];
   failLogins = 0;
+  destroyed = false;
 
   on(event: string, listener: (...args: any[]) => void) {
     const existing = this.handlers.get(event) ?? [];
@@ -42,6 +43,10 @@ class FakeRpcClient {
 
   async clearActivity(): Promise<void> {}
 
+  destroy(): void {
+    this.destroyed = true;
+  }
+
   emit(event: string, ...args: any[]) {
     for (const listener of this.handlers.get(event) ?? []) {
       listener(...args);
@@ -63,10 +68,12 @@ test("Discord presence activity renders Pi identity, provider/model, and state",
 });
 
 test("DiscordPresenceClient reconnects after disconnect and reapplies queued presence", async () => {
-  const rpc = new FakeRpcClient();
+  const firstRpc = new FakeRpcClient();
+  const secondRpc = new FakeRpcClient();
+  const clients = [firstRpc, secondRpc];
   const scheduled: Array<{ delay: number; run: () => void }> = [];
   const client = new DiscordPresenceClient(
-    rpc,
+    () => clients.shift() ?? secondRpc,
     ((fn: () => void, delay?: number) => {
       scheduled.push({ delay: delay ?? 0, run: fn });
       return scheduled.length as any;
@@ -76,25 +83,27 @@ test("DiscordPresenceClient reconnects after disconnect and reapplies queued pre
 
   await client.connect();
   await client.setPresence(samplePayload({ state: "thinking" }));
-  assert.equal(rpc.activities.length, 1);
+  assert.equal(firstRpc.activities.length, 1);
 
-  rpc.emit("disconnected");
-  await client.setPresence(samplePayload({ state: "tooling" }));
+  firstRpc.emit("disconnected");
 
   assert.equal(scheduled.length, 1);
   assert.equal(scheduled[0].delay, 1000);
-  assert.equal(rpc.activities.at(-1)?.state, "claude-sonnet-4-5 • Running Tools");
 
   scheduled[0].run();
   await new Promise((resolve) => setImmediate(resolve));
 
-  assert.ok(rpc.loginCalls >= 2);
-  assert.equal(rpc.activities.at(-1)?.state, "claude-sonnet-4-5 • Running Tools");
+  assert.equal(firstRpc.destroyed, true);
+  assert.ok(secondRpc.loginCalls >= 1);
+  assert.equal(secondRpc.activities.at(-1)?.state, "claude-sonnet-4-5 • Thinking");
+
+  await client.setPresence(samplePayload({ state: "tooling" }));
+  assert.equal(secondRpc.activities.at(-1)?.state, "claude-sonnet-4-5 • Running Tools");
 });
 
-test("DiscordPresenceClient stops reconnecting after max retries", async () => {
+test("DiscordPresenceClient retries after initial login failure until Discord returns", async () => {
   const rpc = new FakeRpcClient();
-  rpc.failLogins = 10;
+  rpc.failLogins = 1;
   const scheduled: Array<{ delay: number; run: () => void }> = [];
   const client = new DiscordPresenceClient(
     rpc,
@@ -105,16 +114,13 @@ test("DiscordPresenceClient stops reconnecting after max retries", async () => {
     (() => {}) as typeof clearTimeout
   );
 
-  try {
-    await client.connect();
-  } catch {}
+  await client.setPresence(samplePayload({ state: "thinking" }));
+  assert.equal(scheduled.length, 1);
+  assert.equal(scheduled[0].delay, 1000);
 
-  rpc.emit("disconnected");
-  for (let i = 0; i < 4 && scheduled[i]; i += 1) {
-    scheduled[i].run();
-    await new Promise((resolve) => setImmediate(resolve));
-  }
+  scheduled[0].run();
+  await new Promise((resolve) => setImmediate(resolve));
 
-  assert.equal(scheduled.map((entry) => entry.delay).slice(0, 3).join(","), "1000,2000,4000");
-  assert.equal(rpc.loginCalls, 4);
+  assert.ok(rpc.loginCalls >= 2);
+  assert.equal(rpc.activities.at(-1)?.state, "claude-sonnet-4-5 • Thinking");
 });

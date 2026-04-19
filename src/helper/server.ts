@@ -23,11 +23,13 @@ export function createPresenceServer(
         await onPresence(parsed);
         res.writeHead(204).end();
       } catch (error) {
-        console.error("Failed to process presence update", error);
+        console.error("[pi-discord-presence] Failed to process presence update", error);
         res.writeHead(400).end("Bad Request");
       }
     });
   }).listen(config.serverPort, config.serverHost, () => {
-    console.log(`Presence server listening at http://${config.serverHost}:${config.serverPort}`);
+    if (defaultConfig.debugLogging) {
+      console.log(`Presence server listening at http://${config.serverHost}:${config.serverPort}`);
+    }
   });
 }

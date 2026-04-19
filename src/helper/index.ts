@@ -77,21 +77,28 @@ export async function performShutdown(
   exitCode = 0,
   reason?: string
 ): Promise<void> {
-  if (reason) {
+  if (reason && defaultConfig.debugLogging) {
     console.log(`Received ${reason}, shutting down gracefully...`);
   }
 
   flushPendingUpdate();
   await client.clearPresence();
   await sleep(delayMs);
-  console.log("Shutdown complete");
+  if (defaultConfig.debugLogging) {
+    console.log("Shutdown complete");
+  }
   exit(exitCode);
 }
 
 export async function startHelper(): Promise<void> {
-  await discord.connect();
   const { handlePresence, flushPendingUpdate } = createPresenceHandler(discord);
   createPresenceServer(handlePresence);
+
+  void discord.connect().catch((error) => {
+    if (defaultConfig.debugLogging) {
+      console.log("[pi-discord-presence] Discord RPC unavailable at startup; helper will retry on next presence update", error);
+    }
+  });
 
   process.on("SIGINT", () => {
     void performShutdown(discord, flushPendingUpdate, process.exit, 100, undefined, 0, "SIGINT");
@@ -100,11 +107,11 @@ export async function startHelper(): Promise<void> {
     void performShutdown(discord, flushPendingUpdate, process.exit, 100, undefined, 0, "SIGTERM");
   });
   process.on("uncaughtException", (error) => {
-    console.error("Uncaught exception:", error);
+    console.error("[pi-discord-presence] Uncaught exception:", error);
     void performShutdown(discord, flushPendingUpdate, process.exit, 100, undefined, 1, "uncaughtException");
   });
   process.on("unhandledRejection", (reason, promise) => {
-    console.error("Unhandled rejection at:", promise, "reason:", reason);
+    console.error("[pi-discord-presence] Unhandled rejection at:", promise, "reason:", reason);
     void performShutdown(discord, flushPendingUpdate, process.exit, 100, undefined, 1, "unhandledRejection");
   });
 }
