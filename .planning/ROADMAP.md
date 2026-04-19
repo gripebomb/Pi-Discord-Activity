@@ -86,32 +86,33 @@
 
 ### Requirements
 
-- **INST-01**: User can follow docs to create or configure a Discord application client ID for this integration
-- **INST-02**: User can follow docs to install the Pi extension or package in a supported Pi location
-- **INST-03**: User can follow docs to start the local helper process
-- **INST-04**: User can follow a documented verification flow to confirm end-to-end presence updates
-- **INST-05**: User can install the integration with `pi install` from a supported local path or package flow
-- **INST-06**: User can run a setup script that reduces manual setup steps for local installation
-- **INST-07**: User can follow OS-specific service recipes to keep the helper running outside a dev terminal
+- ~~**INST-01**~~: User can follow docs to create or configure a Discord application client ID for this integration — ✓ verified via `docs/discord-setup.md`
+- ~~**INST-02**~~: User can follow docs to install the Pi extension or package in a supported Pi location — ✓ verified via `INSTALL.md` and `pi install .`
+- ~~**INST-03**~~: User can follow docs to start the local helper process — ✓ verified via `INSTALL.md`, `docs/service-recipes.md`, and `setup.*`
+- ~~**INST-04**~~: User can follow a documented verification flow to confirm end-to-end presence updates — ✓ verified via `docs/verification.md` and `scripts/verify-installation.*`
+- ~~**INST-05**~~: User can install the integration with `pi install` from a supported local path or package flow — ✓ verified via direct `pi install .` execution and `npm pack --dry-run`
+- ~~**INST-06**~~: User can run a setup script that reduces manual setup steps for local installation — ✓ verified via `setup.sh` and `setup.ps1`
+- ~~**INST-07**~~: User can follow OS-specific service recipes to keep the helper running outside a dev terminal — ✓ verified via `docs/service-recipes.md`
 
 ### Success Criteria
 
-1. Discord client ID setup is documented with clear steps and a reference to the Discord Developer Portal
-2. Pi extension/package install instructions cover all supported load methods (local extension path, `pi install` from local path)
-3. Helper startup instructions cover environment variable setup, process start, and how to run in background
-4. Verification flow walks a user through: start helper, load extension in Pi, trigger a known Pi action, observe Discord presence update
-5. `pi install` flow works from the repo root or a packaged distribution
-6. A setup script automates the repetitive local setup steps (Discord client ID, environment variables, extension placement)
-7. OS-specific service recipes cover at least macOS launchd and Linux systemd for running the helper as a background service
+1. ~~Discord client ID setup is documented with clear steps and a reference to the Discord Developer Portal~~ ✓ verified
+2. ~~Pi extension/package install instructions cover all supported load methods (local extension path, `pi install` from local path)~~ ✓ verified
+3. ~~Helper startup instructions cover environment variable setup, process start, and how to run in background~~ ✓ verified
+4. ~~Verification flow walks a user through: start helper, load extension in Pi, trigger a known Pi action, observe Discord presence update~~ ✓ verified
+5. ~~`pi install` flow works from the repo root or a packaged distribution~~ ✓ verified
+6. ~~A setup script automates the repetitive local setup steps (Discord client ID, environment variables, extension placement)~~ ✓ verified
+7. ~~OS-specific service recipes cover at least macOS launchd and Linux systemd for running the helper as a background service~~ ✓ verified
 
 ### Key Implementation Notes
 
-- Add `pi` manifest to `package.json` with `extensions` pointing to `src/extension/index.ts`
-- Add `pi-package` keyword for discoverability
-- Write `INSTALL.md` covering all install and verification steps
-- Create a `setup.sh` or `setup.ps1` script that prompts for or accepts the Discord client ID and wires up the extension
-- Document service recipes for macOS and Linux; Windows can note the manual approach if no reliable recipe is available
-- Ensure runtime dependencies (discord-rpc, zod) are in `dependencies`, not just `devDependencies`
+- Keep `pi` package metadata in `package.json` so `pi install .` works from the repo root
+- Use the built-in default Discord app ID as the first-run path while still documenting custom-app overrides
+- Load `.env` / `.env.local` in the helper bootstrap so setup automation and service recipes control real runtime behavior
+- Provide both guided docs and verification scripts so install failures can be diagnosed without reading source code
+- Trim packaged output with `.npmignore` so install artifacts exclude planning/GSD internals
+
+**Completed:** 2026-04-19 ✓
 
 ---
 
@@ -133,13 +134,13 @@
 | RUNT-03 | Phase 2 | Pending |
 | RUNT-04 | Phase 2 | Pending |
 | RUNT-05 | Phase 2 | Pending |
-| INST-01 | Phase 3 | Pending |
-| INST-02 | Phase 3 | Pending |
-| INST-03 | Phase 3 | Pending |
-| INST-04 | Phase 3 | Pending |
-| INST-05 | Phase 3 | Pending |
-| INST-06 | Phase 3 | Pending |
-| INST-07 | Phase 3 | Pending |
+| INST-01 | Phase 3 | ✓ (2026-04-19) |
+| INST-02 | Phase 3 | ✓ (2026-04-19) |
+| INST-03 | Phase 3 | ✓ (2026-04-19) |
+| INST-04 | Phase 3 | ✓ (2026-04-19) |
+| INST-05 | Phase 3 | ✓ (2026-04-19) |
+| INST-06 | Phase 3 | ✓ (2026-04-19) |
+| INST-07 | Phase 3 | ✓ (2026-04-19) |
 
 **Coverage:**
 - v1 requirements: 21 total
@@ -148,4 +149,4 @@
 
 ---
 *Roadmap created: 2026-04-19*
-*Last updated: 2026-04-19 after Phase 1 completion*
+*Last updated: 2026-04-19 after Phase 3 execution and verification*

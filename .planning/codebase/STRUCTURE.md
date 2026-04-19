@@ -6,124 +6,137 @@
 
 ```text
 pi-presence-discord/
-├── .pi/                    # Pi/GSD project metadata, templates, prompts, and workflows
-│   ├── example-settings.json  # Example local env-backed settings
-│   └── gsd/                # Agents, hooks, prompts, references, templates, workflows
+├── .pi/                    # Pi extension example config and committed GSD metadata
+│   ├── example-settings.json
+│   ├── extensions/
+│   └── gsd/
+├── .planning/              # Planning artifacts, phase docs, and codebase map docs
+├── docs/                   # User-facing setup, service, and verification guides
+├── scripts/                # Automation and verification helper scripts
 ├── src/                    # TypeScript source code
 │   ├── cli/                # Helper executable entry points
-│   ├── extension/          # Pi extension scaffold and local transport
-│   ├── helper/             # Discord RPC daemon and local HTTP server
-│   └── shared/             # Shared config and payload contracts
-├── .planning/              # Generated planning/codebase docs (created by GSD workflows)
-├── package.json            # Scripts, dependencies, bin entry, engine requirements
-├── README.md               # Project overview and setup instructions
+│   ├── extension/          # Pi extension lifecycle/event handling
+│   ├── helper/             # Discord RPC daemon and local HTTP bridge
+│   ├── shared/             # Shared config and payload contracts
+│   └── types/              # Local ambient type declarations
+├── tests/                  # Unit and integration tests
+│   ├── helper/
+│   └── integration/
+├── INSTALL.md              # Full installation guide
+├── README.md               # Quick-start and overview
+├── setup.ps1               # Windows setup automation
+├── setup.sh                # Unix setup automation
+├── package.json            # Scripts, dependencies, Pi metadata, engine requirements
+├── package-lock.json       # npm lockfile
 ├── tsconfig.json           # TypeScript compiler config
-└── .gitignore              # Ignored build artifacts, env files, and logs
+├── .gitignore              # Ignored build artifacts, env files, and logs
+└── .npmignore              # Files excluded from packaged distribution artifacts
 ```
 
 ## Directory Purposes
 
-**`.pi/`:**
-- Purpose: Pi-specific project scaffolding and GSD workflow assets
-- Contains: `.pi/example-settings.json` and a large `.pi/gsd/` tree
-- Key files: `.pi/example-settings.json`, `.pi/gsd/templates/codebase/*.md`, `.pi/gsd/workflows/*.md`
-- Subdirectories: `agents/`, `hooks/`, `prompts/`, `references/`, `templates/`, `workflows/`
+**`docs/`:**
+- Purpose: install and operations documentation for end users
+- Key files: `docs/discord-setup.md`, `docs/service-recipes.md`, `docs/verification.md`
+
+**`scripts/`:**
+- Purpose: repeatable verification helpers and platform-specific operational checks
+- Key files: `scripts/verify-installation.sh`, `scripts/verify-installation.ps1`
 
 **`src/cli/`:**
-- Purpose: executable entry points for local helper processes
-- Contains: `run-helper.ts`
-- Key files: `src/cli/run-helper.ts` starts the helper daemon
-- Subdirectories: none
+- Purpose: helper process bootstrap
+- Key file: `src/cli/run-helper.ts`
+- Notes: loads `.env` / `.env.local` before starting the compiled helper runtime
 
 **`src/extension/`:**
-- Purpose: Pi extension-side event hooks and HTTP publisher logic
-- Contains: `index.ts`, `state.ts`, `transport.ts`
-- Key files: `src/extension/index.ts` exposes lifecycle hooks; `src/extension/state.ts` manages payload state
-- Subdirectories: none
+- Purpose: Pi extension-side lifecycle hooks and HTTP publisher logic
+- Key files: `src/extension/index.ts`, `src/extension/state.ts`, `src/extension/transport.ts`
 
 **`src/helper/`:**
-- Purpose: helper daemon that accepts presence updates and talks to Discord
-- Contains: `index.ts`, `server.ts`, `discord.ts`
+- Purpose: helper daemon that accepts presence updates and talks to Discord RPC
 - Key files: `src/helper/index.ts`, `src/helper/server.ts`, `src/helper/discord.ts`
-- Subdirectories: none
 
 **`src/shared/`:**
-- Purpose: shared types and environment-backed defaults
-- Contains: `config.ts`, `types.ts`
-- Key files: `src/shared/types.ts`, `src/shared/config.ts`
-- Subdirectories: none
+- Purpose: shared config and payload contracts used by both extension and helper
+- Key files: `src/shared/config.ts`, `src/shared/types.ts`
+
+**`src/types/`:**
+- Purpose: local ambient declarations for third-party/runtime-provided APIs
+- Key files: `src/types/discord-rpc.d.ts`, `src/types/pi-coding-agent.d.ts`
+
+**`tests/`:**
+- Purpose: automated verification of helper, extension, and integration behavior
+- Key files: `tests/extension.test.ts`, `tests/helper/discord-reconnect.test.ts`, `tests/helper/shutdown.test.ts`, `tests/integration/presence-e2e.test.ts`
 
 ## Key File Locations
 
 **Entry Points:**
 - `src/cli/run-helper.ts` - CLI startup for the Discord helper
-- `src/extension/index.ts` - extension-facing hook surface and local dev bootstrap
+- `src/extension/index.ts` - Pi extension event wiring and payload publication
 
 **Configuration:**
-- `package.json` - npm scripts, dependencies, `bin` registration, Node engine
-- `tsconfig.json` - TS compile target/output/module settings
-- `.pi/example-settings.json` - example runtime environment variables
+- `package.json` - npm scripts, dependencies, Pi package metadata, Node engine
+- `package-lock.json` - committed npm dependency lockfile
+- `.pi/example-settings.json` - example runtime environment values
 - `src/shared/config.ts` - actual runtime config defaults and env resolution
+- `.npmignore` - packaging filter for installable tarballs
 
 **Core Logic:**
 - `src/extension/state.ts` - mutable presence state management
 - `src/extension/transport.ts` - HTTP publishing to helper
 - `src/helper/server.ts` - local `POST /presence` server
-- `src/helper/discord.ts` - Discord RPC formatting and updates
+- `src/helper/discord.ts` - Discord RPC formatting, reconnect, and updates
 
 **Testing:**
-- No test directory or `*.test.*` files currently exist
+- `tests/extension.test.ts` - extension registration expectations
+- `tests/helper/*.test.ts` - helper rendering, reconnect, debounce, shutdown coverage
+- `tests/integration*.test.ts` - helper server and transport integration coverage
 
 **Documentation:**
-- `README.md` - user/developer overview
-- `.pi/gsd/templates/codebase/*.md` - templates for codebase-map docs
+- `README.md` - quick-start and overview
+- `INSTALL.md` - full install flow
+- `docs/*.md` - setup, service, and verification guides
 
 ## Naming Conventions
 
 **Files:**
-- kebab-case TypeScript filenames across `src/` (for example `run-helper.ts`)
-- lowercase single-purpose modules are common (`index.ts`, `state.ts`, `server.ts`, `config.ts`, `types.ts`)
-- Markdown docs use uppercase root names like `README.md` and GSD-generated docs like `.planning/codebase/STACK.md`
+- kebab-case TypeScript filenames across runtime code and scripts
+- markdown docs use descriptive lowercase names under `docs/`
+- phase artifacts under `.planning/phases/` use `NN-PLAN-XX.md` and `NN-XX-SUMMARY.md`
 
 **Directories:**
-- lowercase directory names (`src/helper`, `src/shared`, `.pi/gsd/templates`)
-- directories are organized by runtime concern rather than by feature slice
-
-**Special Patterns:**
-- `index.ts` is used as the public entry module for both `src/extension/` and `src/helper/`
-- `.pi/gsd/` is a special project metadata tree, not app runtime code
+- runtime code is organized by concern (`extension`, `helper`, `shared`) rather than by feature slice
+- operational docs live in `docs/`, automation in `scripts/`, planning artifacts in `.planning/`
 
 ## Where to Add New Code
 
-**New Pi event integration:**
+**New Pi integration behavior:**
 - Primary code: `src/extension/`
-- Shared payload/type updates: `src/shared/types.ts`
+- Shared payload changes: `src/shared/types.ts`
 - Config changes: `src/shared/config.ts`
 
-**New Discord/helper behavior:**
-- Implementation: `src/helper/`
-- CLI startup adjustments: `src/cli/run-helper.ts`
-- Shared contracts: `src/shared/`
+**New helper/runtime behavior:**
+- Primary code: `src/helper/`
+- Bootstrap or env-loading changes: `src/cli/run-helper.ts`
+- Cross-cutting types/config: `src/shared/`
 
 **New tests:**
-- No existing convention yet; likely best options are collocated `*.test.ts` in `src/` or a new top-level `tests/` directory
+- Add unit tests under `tests/` grouped by subsystem
+- Keep helper integration tests under `tests/integration/` when exercising the HTTP bridge
 
-**New documentation/config examples:**
-- User-facing docs: `README.md`
-- Pi-local examples: `.pi/example-settings.json`
-- Planning/reference docs: `.planning/` or `.pi/gsd/templates/`
+**New docs/automation:**
+- User-facing docs: `README.md`, `INSTALL.md`, `docs/`
+- Operational scripts: `scripts/`, `setup.sh`, `setup.ps1`
 
 ## Special Directories
 
-**`.pi/gsd/`:**
-- Purpose: bundled GSD agents, prompts, templates, and workflows
-- Source: committed project metadata
+**`.pi/`:**
+- Purpose: Pi-specific project scaffolding plus committed GSD workflow assets
 - Committed: yes
 
 **`.planning/`:**
-- Purpose: generated planning artifacts such as this codebase map
-- Source: created by GSD workflows during analysis/planning
-- Committed: currently not ignored by `.gitignore`, so these docs can be checked in
+- Purpose: generated planning artifacts, summaries, verification reports, and codebase-map docs
+- Committed: yes
 
 ---
 

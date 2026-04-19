@@ -5,125 +5,89 @@
 ## Test Framework
 
 **Runner:**
-- None configured yet
-- There is no `test` script in `package.json`
-- No `vitest`, `jest`, `mocha`, `ava`, `playwright`, or similar dependency is present
-
-**Assertion Library:**
-- None installed
-- Verification currently relies on manual local runs and TypeScript compilation
+- Node's built-in test runner via `tsx --test`
+- Configured in `package.json#scripts.test`
 
 **Run Commands:**
 ```bash
-npm run build               # Current verification baseline; compiles the project with TypeScript
-npm run dev:helper          # Manual helper validation
-npm run dev:extension       # Manual extension scaffold validation
-npm start                   # Run the built helper entry after compilation
+npm test                          # full automated test suite
+npm run build                     # compile verification baseline
+./scripts/verify-installation.sh  # install/package/helper smoke tests on Unix
+pwsh ./scripts/verify-installation.ps1  # Windows verification helper
 ```
 
 ## Test File Organization
 
-**Location:**
-- No test files exist under `src/` or a top-level `tests/` directory
-- Search found no `*.test.*`, `*.spec.*`, or `__tests__/` patterns in the repository
-
-**Naming:**
-- Not established yet
-- If adding tests, the most natural fit would be collocated `*.test.ts` files near the corresponding source modules such as `src/helper/discord.test.ts`
+**Locations:**
+- `tests/extension.test.ts` - extension event-registration expectations
+- `tests/helper/discord-reconnect.test.ts` - activity rendering and reconnect behavior
+- `tests/helper/shutdown.test.ts` - debounce and shutdown cleanup behavior
+- `tests/integration.test.ts` - local transport integration coverage
+- `tests/integration/presence-e2e.test.ts` - extension-to-helper end-to-end payload path
+- `tests/state.test.ts` - privacy and presence-state behavior
 
 **Structure:**
 ```text
-Current repo state:
-src/
-  cli/
-  extension/
-  helper/
-  shared/
-(no tests yet)
+tests/
+├── extension.test.ts
+├── helper/
+│   ├── discord-reconnect.test.ts
+│   └── shutdown.test.ts
+├── integration/
+│   └── presence-e2e.test.ts
+├── integration.test.ts
+└── state.test.ts
 ```
 
-## Test Structure
+## Current Verification Pattern
 
-**Observed Verification Pattern:**
-- Build-time verification via `tsc -p tsconfig.json`
-- Manual runtime verification using the direct-execution bootstrap in `src/extension/index.ts`
-- Manual end-to-end verification by running the helper and extension in separate terminals, as documented in `README.md`
+**Automated:**
+- `npm test` for unit + integration coverage
+- `npm run build` for compile-time validation
+- `./scripts/verify-installation.sh` for packaging, helper endpoint, and install smoke tests
 
-**Patterns to Preserve When Adding Tests:**
-- Focus on boundary-heavy modules first: `src/shared/types.ts`, `src/extension/state.ts`, `src/helper/server.ts`, `src/helper/discord.ts`
-- Prefer deterministic unit tests for payload shaping, debounce behavior, and privacy formatting
-- Keep integration tests local by mocking Discord RPC and HTTP calls rather than requiring a real Discord desktop client in CI
+**Manual / human-needed:**
+- Live Discord desktop confirmation using `docs/verification.md`
+- Cross-platform Windows execution of PowerShell scripts when a Windows or `pwsh` environment is available
 
-## Mocking
+## Mocking and Isolation
 
-**Framework:**
-- Not implemented yet
-- Future test setup will need module mocking for `discord-rpc`, `fetch`, timers, and Node HTTP interactions
+**Current approach:**
+- Discord RPC client behavior is dependency-injected for reconnect tests
+- Integration tests use the real local HTTP server path where practical
+- Runtime config is isolated through environment overrides and helper bootstrap control
 
-**What to Mock:**
-- Discord RPC client in `src/helper/discord.ts`
-- `fetch` used by `src/extension/transport.ts`
-- Time/debounce behavior in `src/helper/index.ts`
-- Environment variables consumed by `src/shared/config.ts`
+**What to keep mocking:**
+- Discord RPC client internals
+- timers for debounce/reconnect behavior
+- process exit behavior during shutdown tests
 
-**What NOT to Mock:**
-- Zod schemas in `src/shared/types.ts`
-- Pure formatting helpers like `humanizeState()` and `normalizeKey()`
-- `PresenceState` state transitions in `src/extension/state.ts` when unit-testing internal behavior
+**What not to over-mock:**
+- Zod schemas and payload contracts
+- pure formatting helpers like `humanizeState()` / `normalizeKey()`
+- extension-to-helper transport when an in-process server can be used directly
 
-## Fixtures and Factories
+## Coverage Focus
 
-**Test Data:**
-- No fixtures or factories exist yet
-- A future test suite should centralize reusable payload builders around the `PresencePayload` shape from `src/shared/types.ts`
-- Example logical fixture targets: valid payloads, malformed payload JSON, privacy-mode on/off variants, debounce edge cases
+High-value covered areas already include:
+- helper rendering and provider/model state formatting
+- reconnect and queued presence replay
+- debounce and graceful shutdown behavior
+- privacy-default handling
+- extension-to-helper payload transport
 
-**Location:**
-- Not established
-- Good future options: collocated factories in test files or a dedicated `tests/fixtures/` directory if the suite grows
+Still best suited for manual validation:
+- live Discord desktop presentation
+- platform-specific service-manager behavior (`launchd`, `systemd`, NSSM)
+- Windows PowerShell execution in a real Windows environment
 
-## Coverage
+## Patterns to Preserve
 
-**Requirements:**
-- No coverage target configured
-- No coverage tooling or report generation exists
-
-**Configuration:**
-- None
-- There is no CI gate enforcing tests or coverage before merge
-
-## Test Types
-
-**Unit Tests:**
-- Missing but strongly needed for `src/extension/state.ts`, `src/shared/types.ts`, and helper formatting logic in `src/helper/discord.ts`
-
-**Integration Tests:**
-- Missing but useful for the local HTTP path from `src/extension/transport.ts` to `src/helper/server.ts`
-
-**E2E Tests:**
-- Not present
-- Real E2E would require a running helper process, Discord desktop, and Pi hook simulation
-
-## Common Patterns
-
-**Current Manual Workflow:**
-- Start helper with `npm run dev:helper`
-- Start the scaffolded extension with `npm run dev:extension`
-- Observe console output from `src/helper/server.ts` and `src/helper/discord.ts`
-- Confirm Discord activity changes and privacy behavior manually
-
-**Highest-Value First Tests to Add:**
-- Schema validation success/failure cases for `presencePayloadSchema`
-- `PresenceState.update()` behavior with privacy-mode defaults and project-name handling
-- HTTP 204/400 behavior in `createPresenceServer()`
-- Debounce behavior in `handlePresence()` from `src/helper/index.ts`
-- Activity formatting and provider-key normalization in `src/helper/discord.ts`
-
-**Snapshot Testing:**
-- Not used
-- Explicit assertions will likely be clearer than snapshots for this small integration project
+- Keep tests local and deterministic; prefer mocked Discord RPC over requiring a live Discord desktop client in automated checks
+- Use integration tests for the helper HTTP boundary instead of only unit-testing request parsing
+- Keep install verification separate from unit tests via the `scripts/verify-installation.*` smoke-test scripts
 
 ---
 
 *Testing analysis: 2026-04-19*
-*Update when test patterns change*
+*Update when test runner or verification flow changes*

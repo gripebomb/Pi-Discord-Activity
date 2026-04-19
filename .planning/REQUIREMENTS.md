@@ -30,13 +30,13 @@
 
 ### Install
 
-- [ ] **INST-01**: User can follow docs to create or configure a Discord application client ID for this integration
-- [ ] **INST-02**: User can follow docs to install the Pi extension or package in a supported Pi location
-- [ ] **INST-03**: User can follow docs to start the local helper process
-- [ ] **INST-04**: User can follow a documented verification flow to confirm end-to-end presence updates
-- [ ] **INST-05**: User can install the integration with `pi install` from a supported local path or package flow
-- [ ] **INST-06**: User can run a setup script that reduces manual setup steps for local installation
-- [ ] **INST-07**: User can follow OS-specific service recipes to keep the helper running outside a dev terminal
+- [x] **INST-01**: User can follow docs to create or configure a Discord application client ID for this integration
+- [x] **INST-02**: User can follow docs to install the Pi extension or package in a supported Pi location
+- [x] **INST-03**: User can follow docs to start the local helper process
+- [x] **INST-04**: User can follow a documented verification flow to confirm end-to-end presence updates
+- [x] **INST-05**: User can install the integration with `pi install` from a supported local path or package flow
+- [x] **INST-06**: User can run a setup script that reduces manual setup steps for local installation
+- [x] **INST-07**: User can follow OS-specific service recipes to keep the helper running outside a dev terminal
 
 ## v2 Requirements
 
@@ -71,13 +71,13 @@
 | RUNT-03 | Phase 2 | Pending |
 | RUNT-04 | Phase 2 | Pending |
 | RUNT-05 | Phase 2 | Pending |
-| INST-01 | Phase 3 | Pending |
-| INST-02 | Phase 3 | Pending |
-| INST-03 | Phase 3 | Pending |
-| INST-04 | Phase 3 | Pending |
-| INST-05 | Phase 3 | Pending |
-| INST-06 | Phase 3 | Pending |
-| INST-07 | Phase 3 | Pending |
+| INST-01 | Phase 3 | ✓ (2026-04-19) |
+| INST-02 | Phase 3 | ✓ (2026-04-19) |
+| INST-03 | Phase 3 | ✓ (2026-04-19) |
+| INST-04 | Phase 3 | ✓ (2026-04-19) |
+| INST-05 | Phase 3 | ✓ (2026-04-19) |
+| INST-06 | Phase 3 | ✓ (2026-04-19) |
+| INST-07 | Phase 3 | ✓ (2026-04-19) |
 
 **Coverage:**
 - v1 requirements: 21 total
@@ -86,4 +86,4 @@
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 after roadmap creation*
+*Last updated: 2026-04-19 after Phase 3 execution and verification*
