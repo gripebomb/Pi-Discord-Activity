@@ -1,8 +1,11 @@
 import http from "node:http";
 import { presencePayloadSchema, type PresencePayload } from "../shared/types.js";
-import { defaultConfig } from "../shared/config.js";
+import { defaultConfig, type PresenceConfig } from "../shared/config.js";
 
-export function createPresenceServer(onPresence: (payload: PresencePayload) => Promise<void>) {
+export function createPresenceServer(
+  onPresence: (payload: PresencePayload) => Promise<void>,
+  config: Pick<PresenceConfig, "serverHost" | "serverPort"> = defaultConfig
+) {
   return http.createServer((req, res) => {
     if (req.method !== "POST" || req.url !== "/presence") {
       res.writeHead(404).end("Not Found");
@@ -24,7 +27,7 @@ export function createPresenceServer(onPresence: (payload: PresencePayload) => P
         res.writeHead(400).end("Bad Request");
       }
     });
-  }).listen(defaultConfig.serverPort, defaultConfig.serverHost, () => {
-    console.log(`Presence server listening at http://${defaultConfig.serverHost}:${defaultConfig.serverPort}`);
+  }).listen(config.serverPort, config.serverHost, () => {
+    console.log(`Presence server listening at http://${config.serverHost}:${config.serverPort}`);
   });
 }

@@ -29,3 +29,28 @@ test("PresenceState updates activities without losing model identity", () => {
   assert.equal(payload.model, "claude-sonnet-4-5");
   assert.equal(payload.state, "thinking");
 });
+
+test("PresenceState keeps projectName hidden by default even when provided", () => {
+  const state = new PresenceState();
+  const payload = state.startSession({
+    sessionId: "session-3",
+    provider: "openai",
+    model: "gpt-5.4",
+    projectName: "secret-project"
+  });
+
+  assert.equal(payload.privacyMode, true);
+  assert.equal(payload.projectName, undefined);
+});
+
+test("PresenceState allows privacy mode to be explicitly disabled in payload state", () => {
+  const state = new PresenceState();
+  const payload = state.startSession({
+    sessionId: "session-4",
+    provider: "openai",
+    model: "gpt-5.4",
+    privacyMode: false
+  });
+
+  assert.equal(payload.privacyMode, false);
+});

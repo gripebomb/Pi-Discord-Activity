@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-last_updated: "2026-04-19T09:15:00.000Z"
-last_activity: 2026-04-19 - Phase 2 planning complete; 3 plans in 2 waves
+last_updated: "2026-04-19T08:21:33.897Z"
+last_activity: 2026-04-19 - Phase 2 executed; awaiting human verification
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 0
-  completed_plans: 3
+  completed_plans: 6
 ---
 
 # State
@@ -19,24 +19,24 @@ progress:
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-04-19 after Phase 1 completion)
+See: `.planning/PROJECT.md` (updated 2026-04-19 after Phase 2 execution)
 
 **Core value:** Real Pi activity should appear reliably in Discord Rich Presence with minimal setup and without leaking sensitive project details by default.
-**Current focus:** Phase 2 - Presence + Helper Hardening
+**Current focus:** Phase 2 - Presence + Helper Hardening (awaiting human verification)
 
 ## Current Position
 
-Phase: 01 of 1 (real pi extension wiring)
+Phase: 01 of 2 (real pi extension wiring)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-04-19 - Phase 1 complete; ready to plan Phase 2
+Last activity: 2026-04-19 - Phase 2 executed; awaiting human verification
 
 ## Milestone Progress
 
 | Phase | Status | Plans | Progress |
 | ----- | ------ | ----- | -------- |
 | 1 | ✓ | 3/3 | 100% |
-| 2 | ◆ | 3/3 | 0% |
+| 2 | ◆ | 3/3 | 100% |
 | 3 | ○ | 0/0 | 0% |
 
 ## Accumulated Context
@@ -45,6 +45,8 @@ Last activity: 2026-04-19 - Phase 1 complete; ready to plan Phase 2
 - **Phase 1 delivered:** real `default function (pi: ExtensionAPI)` extension entrypoint, `pi install .` package manifest, 7-event lifecycle wiring, state mapper with privacy gating, timeout-protected helper transport, 5 automated tests
 - **Phase 1 verified live:** Extension loads, model switching updates Discord presence, tool events produce correct state transitions
 - **Phase 2 goal:** Presence + helper hardening — make Discord Rich Presence reliable with stable state transitions, debouncing, reconnection, and privacy controls
+- **Phase 2 delivered:** reconnect-capable Discord RPC client, queued presence replay, state-aware debounce, graceful shutdown cleanup, and 6 passing automated tests
+- **Phase 2 verification:** Automated checks passed; live Discord reconnect and opt-in project visibility still require human confirmation
 - **Phase 3 goal:** Install + docs + verification — make the integration installable via `pi install`, with clear setup and verification docs
 
 ## Blockers
@@ -59,3 +61,4 @@ Last activity: 2026-04-19 - Phase 1 complete; ready to plan Phase 2
 - The extension uses a split design: extension module for Pi events, helper daemon for Discord RPC
 - Privacy-first defaults hide project details unless `PI_PRESENCE_PRIVACY_MODE=false` and `PI_PRESENCE_INCLUDE_PROJECT=true`
 - Phase 1 completed with live Pi + Discord verification 2026-04-19
+- Phase 2 is implemented and automatically verified; remaining checks are live Discord desktop verification steps

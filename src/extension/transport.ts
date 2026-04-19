@@ -1,11 +1,11 @@
-import { defaultConfig } from "../shared/config.js";
+import { defaultConfig, type PresenceConfig } from "../shared/config.js";
 import { presencePayloadSchema, type PresencePayload } from "../shared/types.js";
 
 const PUBLISH_TIMEOUT_MS = 2_000;
 
-export async function publishPresence(payload: PresencePayload): Promise<void> {
+export async function publishPresence(payload: PresencePayload, config: Pick<PresenceConfig, "serverHost" | "serverPort"> = defaultConfig): Promise<void> {
   const parsed = presencePayloadSchema.parse(payload);
-  const url = `http://${defaultConfig.serverHost}:${defaultConfig.serverPort}/presence`;
+  const url = `http://${config.serverHost}:${config.serverPort}/presence`;
 
   const response = await fetch(url, {
     method: "POST",
