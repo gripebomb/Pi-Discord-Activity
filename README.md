@@ -1,31 +1,85 @@
 # pi-discord-presence
 
-A repo-ready starter pack for adding **Discord Rich Presence** support to the **Pi coding agent**.
+A repo-ready package for adding **Discord Rich Presence** support to the **Pi coding agent**.
 
-This scaffold is split into two pieces:
+This project is split into two pieces:
 
-- a **Pi extension** that detects session and model changes and sends presence payloads
-- a **local helper daemon** that owns the Discord RPC connection and updates the user's activity
+- a **Pi extension** that listens to real Pi session and activity events
+- a **local helper daemon** that owns the Discord RPC connection and updates your Discord activity
 
 ## What this starter pack includes
 
 - `package.json`
 - TypeScript build config
-- Pi extension scaffold in `src/extension`
-- Discord helper scaffold in `src/helper`
+- Pi extension implementation in `src/extension`
+- Discord helper implementation in `src/helper`
 - shared types/config in `src/shared`
 - example local settings in `.pi/example-settings.json`
+- install, setup, service, and verification docs
+
+## Quick Start
+
+1. **Configure Discord (optional)**
+
+   The package already ships with a working default Discord application ID, so custom setup is optional.
+
+   ```bash
+   # optional: override the built-in default app
+   export DISCORD_RPC_CLIENT_ID="your_discord_client_id"
+   ```
+
+   For a custom Discord application, see [docs/discord-setup.md](./docs/discord-setup.md).
+
+2. **Install dependencies and build**
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. **Install the Pi extension**
+
+   ```bash
+   pi install .
+   ```
+
+   Manual fallback:
+
+   ```bash
+   mkdir -p ~/.pi/agent/extensions
+   ln -s "$(pwd)/dist/extension/index.js" ~/.pi/agent/extensions/pi-discord-presence.js
+   ```
+
+4. **Start the helper**
+
+   ```bash
+   npm start
+   ```
+
+5. **Verify the integration**
+
+   ```bash
+   ./scripts/verify-installation.sh
+   ```
+
+   Then follow [docs/verification.md](./docs/verification.md) for the manual Discord-side checks.
 
 ## Status
 
-This is a working Pi extension/helper package with a built-in default Discord Rich Presence application ID.
-You can override that default with your own Discord application if you want custom branding or assets.
+This is a working Pi extension/helper package with:
 
-You may still want to:
+- ✅ real Pi extension integration
+- ✅ Discord Rich Presence transport and reconnect handling
+- ✅ a built-in default Discord application ID for low-friction setup
+- ✅ `pi install .` package installation support
+- ✅ setup, service, and verification documentation
 
-1. add Rich Presence image assets like `pi`, `openai`, `anthropic`, etc. to your own Discord app if you override the default
-2. package/install the extension in your Pi environment
-3. add additional install/service polish for your platform
+Typical next steps for a new user:
+
+1. follow [INSTALL.md](./INSTALL.md)
+2. optionally configure a custom Discord application
+3. optionally set up a background service using [docs/service-recipes.md](./docs/service-recipes.md)
+4. verify the full flow with [docs/verification.md](./docs/verification.md)
 
 ## Requirements
 
@@ -36,9 +90,25 @@ You may still want to:
 
 ## Install
 
+For the full guided flow, see [INSTALL.md](./INSTALL.md).
+
+Quick install:
+
 ```bash
 npm install
 npm run build
+pi install .
+npm start
+```
+
+### Guided setup scripts
+
+The repo also includes automation scripts that can write `.env`, build the project, optionally run `pi install .`, and create a background service:
+
+```bash
+./setup.sh
+# or on Windows
+pwsh ./setup.ps1
 ```
 
 ## Local development
@@ -49,122 +119,71 @@ Run the helper daemon:
 npm run dev:helper
 ```
 
-In another terminal, run the extension scaffold in dev mode:
+In another terminal, build and install the extension or use `pi install .` again after making changes.
 
-```bash
-npm run dev:extension
+If you want to test the HTTP transport without Pi, keep the helper running and POST a payload to:
+
+```text
+http://127.0.0.1:42666/presence
 ```
-
-The dev extension will publish a fake session start and a fake idle transition so you can verify the transport path.
 
 ## Environment variables
 
-The package now ships with a built-in default Discord RPC Client ID:
+The package ships with a built-in default Discord RPC client ID:
 
 - `1495329514417426522`
 
-So `DISCORD_RPC_CLIENT_ID` is optional for normal use. Export it only if you want to override the default Discord application:
+So `DISCORD_RPC_CLIENT_ID` is optional for normal use. The helper also reads `.env` and `.env.local` from the project root.
 
-```bash
-export DISCORD_RPC_CLIENT_ID="YOUR_OWN_DISCORD_APP_CLIENT_ID"
-export PI_PRESENCE_PORT="42666"
-export PI_PRESENCE_HOST="127.0.0.1"
-export PI_PRESENCE_PRIVACY_MODE="true"
-export PI_PRESENCE_INCLUDE_PROJECT="false"
-export PI_PRESENCE_DEBOUNCE_MS="2000"
-export PI_PRESENCE_DEBUG="false"
+Common configuration:
+
+```dotenv
+DISCORD_RPC_CLIENT_ID=1495329514417426522
+PI_PRESENCE_PORT=42666
+PI_PRESENCE_HOST=127.0.0.1
+PI_PRESENCE_PRIVACY_MODE=true
+PI_PRESENCE_INCLUDE_PROJECT=false
+PI_PRESENCE_DEBOUNCE_MS=2000
+PI_PRESENCE_DEBUG=false
 ```
 
-## Discord application setup
+### Privacy defaults
 
-By default, the package uses the built-in Discord application ID `1495329514417426522`, so most users do not need to create their own Discord application.
+Default behavior is privacy-first:
 
-If you want custom branding or your own Rich Presence assets, set `DISCORD_RPC_CLIENT_ID` to your own Discord Application ID and upload assets that match the image keys used in `src/helper/discord.ts`:
+- project name is hidden unless explicitly enabled
+- prompt content is never sent to Discord
+- filenames are not sent to Discord
 
-- `pi`
-- provider image keys you plan to use, such as `openai`, `anthropic`, `google`
+To allow project names in the Discord state line, set both:
 
-If you do not upload matching assets, Discord may still connect, but image badges may not render correctly.
-
-## Suggested Pi integration flow
-
-The extension scaffold exposes these functions:
-
-- `onSessionStart()`
-- `onModelChange()`
-- `onThinking()`
-- `onToolCall()`
-- `onFileEdit()`
-- `onIdle()`
-- `onError()`
-
-Your real Pi integration should call those when corresponding events occur.
-
-## Example payload
-
-```json
-{
-  "app": "pi-coding-agent",
-  "provider": "openai",
-  "model": "gpt-5.4",
-  "state": "thinking",
-  "projectName": "example-project",
-  "startedAt": 1776566400,
-  "sessionId": "dev-session",
-  "privacyMode": true
-}
+```bash
+export PI_PRESENCE_PRIVACY_MODE="false"
+export PI_PRESENCE_INCLUDE_PROJECT="true"
 ```
 
 ## Example Discord activity mapping
 
 - **Details**: `Using Pi Coding Agent`
-- **State**: `gpt-5.4 • Thinking`
+- **State**: `<model> • <activity>`
 - **Large image**: `pi`
 - **Small image**: provider key such as `openai`
 
-## Suggested install layout for Pi
+Common activities:
 
-A reasonable local workflow is:
+- `Starting`
+- `Thinking`
+- `Running Tools`
+- `Editing Files`
+- `Idle`
+- `Error`
 
-1. keep this repo in your development directory
-2. build it with `npm run build`
-3. copy or symlink the extension entry into your Pi extension directory
-4. run the helper as a background user service or shell startup command
+## Documentation
 
-Example idea:
-
-```bash
-mkdir -p ~/.pi/agent/extensions
-ln -s /absolute/path/to/pi-discord-presence/dist/extension/index.js ~/.pi/agent/extensions/pi-discord-presence.js
-```
-
-Adjust that layout to match your local Pi install conventions.
-
-## Packaging ideas
-
-Once working, you can turn this into:
-
-- an npm package installable by Pi
-- a Homebrew package or shell installer for the helper
-- a small release bundle with prebuilt JavaScript files
-
-## Privacy recommendations
-
-Default behavior in this scaffold is privacy-first:
-
-- project name is hidden unless explicitly enabled
-- prompt content is never sent to Discord
-- filenames are not shown
-
-That is a safer default for coding work.
-
-## Next implementation steps
-
-1. expand install/setup docs
-2. document service/background-run options
-3. add config file loading
-4. add better multi-session handling
-5. add Windows/macOS/Linux service helpers
+- [INSTALL.md](./INSTALL.md) — full installation guide
+- [docs/discord-setup.md](./docs/discord-setup.md) — custom Discord application setup
+- [docs/service-recipes.md](./docs/service-recipes.md) — macOS, Linux, and Windows service recipes
+- [docs/verification.md](./docs/verification.md) — manual verification flow and troubleshooting
 
 ## License
 
