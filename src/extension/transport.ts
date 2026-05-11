@@ -20,3 +20,16 @@ export async function publishPresence(payload: PresencePayload, config: Pick<Pre
     throw new Error(`Presence publish failed: ${response.status} ${response.statusText}`);
   }
 }
+
+export async function clearPresence(config: Pick<PresenceConfig, "serverHost" | "serverPort"> = defaultConfig): Promise<void> {
+  const url = `http://${config.serverHost}:${config.serverPort}/clear`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    signal: AbortSignal.timeout(PUBLISH_TIMEOUT_MS)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Presence clear failed: ${response.status} ${response.statusText}`);
+  }
+}

@@ -10,7 +10,7 @@ test("transport publishes payloads the helper server accepts", async () => {
 
   const server = createPresenceServer(async (payload) => {
     received = payload;
-  }, config);
+  }, async () => {}, config);
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 25));

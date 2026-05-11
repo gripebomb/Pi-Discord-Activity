@@ -4,11 +4,22 @@ import { defaultConfig, type PresenceConfig } from "../shared/config.js";
 
 export function createPresenceServer(
   onPresence: (payload: PresencePayload) => Promise<void>,
+  onClear: () => Promise<void> = async () => {},
   config: Pick<PresenceConfig, "serverHost" | "serverPort"> = defaultConfig
 ) {
   return http.createServer((req, res) => {
     if (req.method === "GET" && req.url === "/health") {
       res.writeHead(204).end();
+      return;
+    }
+
+    if (req.method === "POST" && req.url === "/clear") {
+      void onClear().then(() => {
+        res.writeHead(204).end();
+      }).catch((error) => {
+        console.error("[pi-discord-activity] Failed to process clear request", error);
+        res.writeHead(500).end("Internal Server Error");
+      });
       return;
     }
 

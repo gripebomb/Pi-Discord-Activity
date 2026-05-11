@@ -49,8 +49,9 @@ test("extension maps Pi lifecycle events into normalized presence payloads", asy
 
   const calls: any[] = [];
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = (async (_input: URL | RequestInfo, init?: RequestInit) => {
-    calls.push(JSON.parse(String(init?.body ?? "{}")));
+  globalThis.fetch = (async (input: URL | RequestInfo, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    calls.push({ url, body: JSON.parse(String(init?.body ?? "{}")) });
     return new Response(null, { status: 204 });
   }) as typeof fetch;
 
@@ -87,21 +88,22 @@ test("extension maps Pi lifecycle events into normalized presence payloads", asy
     await pi.handlers.get("agent_end")?.({ type: "agent_end", messages: [] }, ctx);
     await pi.handlers.get("session_shutdown")?.({ type: "session_shutdown" }, ctx);
 
-    assert.equal(calls[0].state, "starting");
-    assert.equal(calls[0].provider, "openai");
-    assert.equal(calls[0].model, "gpt-5.4");
-    assert.equal(calls[0].sessionId, "session-123");
+    assert.equal(calls[0].body.state, "starting");
+    assert.equal(calls[0].body.provider, "openai");
+    assert.equal(calls[0].body.model, "gpt-5.4");
+    assert.equal(calls[0].body.sessionId, "session-123");
 
-    assert.equal(calls[1].provider, "anthropic");
-    assert.equal(calls[1].model, "claude-sonnet-4-5");
-    assert.equal(calls[2].state, "thinking");
-    assert.equal(calls[3].state, "tooling");
-    assert.equal(calls[4].state, "thinking");
-    assert.equal(calls[5].state, "editing");
-    assert.equal(calls[6].state, "thinking");
-    assert.equal(calls[7].state, "idle");
+    assert.equal(calls[1].body.provider, "anthropic");
+    assert.equal(calls[1].body.model, "claude-sonnet-4-5");
+    assert.equal(calls[2].body.state, "thinking");
+    assert.equal(calls[3].body.state, "tooling");
+    assert.equal(calls[4].body.state, "thinking");
+    assert.equal(calls[5].body.state, "editing");
+    assert.equal(calls[6].body.state, "thinking");
+    assert.equal(calls[7].body.state, "idle");
+    assert.ok(calls[8].url.includes("/clear"), "session_shutdown should call /clear endpoint");
 
-    assert.equal(calls.length, 8, "session_shutdown should dedupe when already idle");
+    assert.equal(calls.length, 9, "session_shutdown should call clear endpoint after agent_end idle");
   } finally {
     globalThis.fetch = originalFetch;
   }

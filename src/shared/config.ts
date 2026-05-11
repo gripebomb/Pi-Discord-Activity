@@ -8,6 +8,7 @@ export interface PresenceConfig {
   debounceMs: number;
   autostartHelper: boolean;
   debugLogging: boolean;
+  presenceTimeoutMs: number;
 }
 
 export const defaultConfig: PresenceConfig = {
@@ -19,5 +20,6 @@ export const defaultConfig: PresenceConfig = {
   includeProjectName: process.env.PI_PRESENCE_INCLUDE_PROJECT === "true",
   debounceMs: Number(process.env.PI_PRESENCE_DEBOUNCE_MS ?? "2000"),
   autostartHelper: process.env.PI_PRESENCE_AUTOSTART_HELPER !== "false",
-  debugLogging: process.env.PI_PRESENCE_DEBUG === "true"
+  debugLogging: process.env.PI_PRESENCE_DEBUG === "true",
+  presenceTimeoutMs: Number(process.env.PI_PRESENCE_TIMEOUT_MS ?? "600000")
 };

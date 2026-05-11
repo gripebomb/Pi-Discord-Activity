@@ -14,21 +14,26 @@ const RECOVERABLE_DISCORD_ERROR_PATTERNS = [
 const discord = new DiscordPresenceClient();
 
 export function createPresenceHandler(
-  client: Pick<DiscordPresenceClient, "setPresence">,
+  client: Pick<DiscordPresenceClient, "setPresence" | "clearPresence">,
   debounceMs = defaultConfig.debounceMs,
   now: () => number = Date.now,
   schedule: typeof setTimeout = setTimeout,
-  cancel: typeof clearTimeout = clearTimeout
+  cancel: typeof clearTimeout = clearTimeout,
+  presenceTimeoutMs = defaultConfig.presenceTimeoutMs
 ) {
   let lastSentAt = 0;
   let lastSentPayload: PresencePayload | null = null;
   let pendingPayload: PresencePayload | null = null;
   let pendingUpdate: ReturnType<typeof setTimeout> | null = null;
+  let lastReceivedAt = 0;
+  let timeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
   async function sendPresence(payload: PresencePayload): Promise<void> {
     lastSentAt = now();
     lastSentPayload = payload;
     pendingPayload = null;
+    lastReceivedAt = now();
+    restartTimeoutMonitor();
     await client.setPresence(payload);
   }
 
@@ -37,6 +42,9 @@ export function createPresenceHandler(
   }
 
   async function handlePresence(payload: PresencePayload): Promise<void> {
+    lastReceivedAt = now();
+    restartTimeoutMonitor();
+
     if (pendingUpdate) {
       cancel(pendingUpdate);
       pendingUpdate = null;
@@ -65,6 +73,21 @@ export function createPresenceHandler(
     await sendPresence(payload);
   }
 
+  async function handleClear(): Promise<void> {
+    lastReceivedAt = 0;
+    lastSentPayload = null;
+    pendingPayload = null;
+    if (pendingUpdate) {
+      cancel(pendingUpdate);
+      pendingUpdate = null;
+    }
+    if (timeoutTimer) {
+      cancel(timeoutTimer);
+      timeoutTimer = null;
+    }
+    await client.clearPresence();
+  }
+
   function flushPendingUpdate(): void {
     if (pendingUpdate) {
       cancel(pendingUpdate);
@@ -73,7 +96,23 @@ export function createPresenceHandler(
     pendingPayload = null;
   }
 
-  return { handlePresence, flushPendingUpdate };
+  function restartTimeoutMonitor(): void {
+    if (timeoutTimer) {
+      cancel(timeoutTimer);
+    }
+    if (presenceTimeoutMs <= 0) {
+      return;
+    }
+    timeoutTimer = schedule(() => {
+      if (defaultConfig.debugLogging) {
+        console.log("[pi-discord-activity] Presence timed out; clearing Discord activity");
+      }
+      void client.clearPresence();
+      timeoutTimer = null;
+    }, presenceTimeoutMs);
+  }
+
+  return { handlePresence, handleClear, flushPendingUpdate };
 }
 
 export async function performShutdown(
@@ -126,8 +165,8 @@ export function isRecoverableDiscordRuntimeError(error: unknown): boolean {
 }
 
 export async function startHelper(): Promise<void> {
-  const { handlePresence, flushPendingUpdate } = createPresenceHandler(discord);
-  createPresenceServer(handlePresence);
+  const { handlePresence, handleClear, flushPendingUpdate } = createPresenceHandler(discord);
+  createPresenceServer(handlePresence, handleClear);
 
   void discord.connect().catch((error) => {
     if (defaultConfig.debugLogging) {

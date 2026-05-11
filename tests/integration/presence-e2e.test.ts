@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPresenceServer } from "../../src/helper/server.js";
-import { publishPresence } from "../../src/extension/transport.js";
+import { clearPresence, publishPresence } from "../../src/extension/transport.js";
 import type { PresencePayload } from "../../src/shared/types.js";
 
 test("extension transport sends payloads that helper server accepts end-to-end", async () => {
@@ -10,7 +10,7 @@ test("extension transport sends payloads that helper server accepts end-to-end",
 
   const server = createPresenceServer(async (payload) => {
     received = payload;
-  }, config);
+  }, async () => {}, config);
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 25));
@@ -32,6 +32,30 @@ test("extension transport sends payloads that helper server accepts end-to-end",
     assert.equal(received?.model, "claude-sonnet-4-5");
     assert.equal(received?.state, "thinking");
     assert.equal(received?.sessionId, "session-e2e");
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => {
+        if (error) reject(error);
+        else resolve();
+      });
+    });
+  }
+});
+
+test("extension transport sends clear request that helper server accepts end-to-end", async () => {
+  let cleared = false;
+  const config = { serverHost: "127.0.0.1", serverPort: 42669 };
+
+  const server = createPresenceServer(async () => {}, async () => {
+    cleared = true;
+  }, config);
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+
+    await clearPresence(config);
+
+    assert.equal(cleared, true);
   } finally {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => {

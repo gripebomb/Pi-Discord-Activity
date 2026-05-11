@@ -13,7 +13,7 @@ import type {
 import type { ActivityState, PresencePayload } from "../shared/types.js";
 import { PresenceState } from "./state.js";
 import { ensureHelperRunning, isHelperUnavailableError } from "./helper.js";
-import { publishPresence } from "./transport.js";
+import { clearPresence, publishPresence } from "./transport.js";
 
 const LOG_PREFIX = "[pi-discord-activity]";
 const EDITING_TOOLS = new Set(["edit", "write"]);
@@ -128,7 +128,15 @@ export default function (pi: ExtensionAPI): void {
     agentActive = false;
     state.setActivity("idle");
     log("session_shutdown", { state: "idle" });
-    await publishCurrent("session_shutdown");
+
+    try {
+      await clearPresence();
+      log("session_shutdown", { cleared: true });
+    } catch (error) {
+      if (!isHelperUnavailableError(error)) {
+        console.error(`${LOG_PREFIX} Failed to clear presence for session_shutdown`, error);
+      }
+    }
   });
 }
 
